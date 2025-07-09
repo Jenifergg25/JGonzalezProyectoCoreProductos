@@ -7,7 +7,7 @@ namespace PL.Controllers
         public IActionResult Index()
         { 
             return View();
-        }
+        } 
         private readonly BL.Usuario _usuario;
 
         public UsuarioController(BL.Usuario usuario)
