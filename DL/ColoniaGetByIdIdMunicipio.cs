@@ -4,14 +4,16 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ML
+namespace DL
 {
-    public class Colonia
+    public class ColoniaGetByIdIdMunicipio
     {
         public int IdColonia { get; set; }
-        public string? Nombre { get; set; }
+
+        public string? Colonia { get; set; }
+
         public string? CodigoPostal { get; set; }
-        public List<object>? Colonias { get; set; }
-        public ML.Municipio? Municipio { get; set; } //Modelo Municipio (IdMunicipio)
+
+        public int? IdMunicipio { get; set; }
     }
 }

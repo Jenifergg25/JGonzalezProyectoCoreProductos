@@ -28,10 +28,15 @@ public partial class JgonzalezProgramacionNcapasContext : DbContext
     public virtual DbSet<Usuario> Usuarios { get; set; }
 
     public virtual DbSet<UsuarioView> UsuarioViews { get; set; }
+    public virtual DbSet<UsuarioGetAllView> UsuarioGetAllViews { get; set; }
+    public virtual DbSet<RolGetAll> RolGetAll { get; set; }
+    public virtual DbSet<EstadoGetAll> EstadoGetAll { get; set; }
+    public virtual DbSet<MunicipioGetByIdEstado> MunicipioGetByIdEstado { get; set; }
+    public virtual DbSet<ColoniaGetByIdIdMunicipio> ColoniaGetByIdIdMunicipio { get; set; }
 
-//    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-//#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see https://go.microsoft.com/fwlink/?LinkId=723263.
-//        => optionsBuilder.UseSqlServer("Server=.; Database=JGonzalezProgramacionNCapas; TrustServerCertificate=True; User ID=sa; Password=pass@word1;");
+    //    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+    //#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see https://go.microsoft.com/fwlink/?LinkId=723263.
+    //        => optionsBuilder.UseSqlServer("Server=.; Database=JGonzalezProgramacionNCapas; TrustServerCertificate=True; User ID=sa; Password=pass@word1;");
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -232,6 +237,26 @@ public partial class JgonzalezProgramacionNcapasContext : DbContext
                 .IsUnicode(false);
         });
 
+        modelBuilder.Entity<UsuarioGetAllView>(entity =>
+        {
+            entity.HasNoKey();
+        });
+        modelBuilder.Entity<RolGetAll>(entity =>
+        {
+            entity.HasNoKey();
+        });
+        modelBuilder.Entity<EstadoGetAll>(entity =>
+        {
+            entity.HasNoKey();
+        });
+        modelBuilder.Entity<MunicipioGetByIdEstado>(entity =>
+        {
+            entity.HasNoKey();
+        });
+        modelBuilder.Entity<ColoniaGetByIdIdMunicipio>(entity =>
+        {
+            entity.HasNoKey();
+        });
         OnModelCreatingPartial(modelBuilder);
     }
 
