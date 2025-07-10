@@ -57,58 +57,91 @@ namespace PL.Controllers
 
             ML.Result resultRol = _rol.GetAllEFSP();
             ML.Result resultEstado = _estado.GetAllEFSP();
-
-            if (resultRol.Correct)
-            {
-                usuario.Rol.Roles = resultRol.Objects;
-            }
-
-            if (resultEstado.Correct)
-            {
-                usuario.Direccion.Colonia.Municipio.Estado.Estados = resultEstado.Objects;
-            }
-
             usuario.Direccion.Colonia.Municipio.Municipios = new List<object>();
             usuario.Direccion.Colonia.Colonias = new List<object>();
 
             ML.Result result = new ML.Result();
-            result = _usuario.GetByIdEFSP(IdUsuario.Value);
-            if (result.Correct)
+            if (IdUsuario == null)
             {
-                usuario = (ML.Usuario)result.Object;
-                //ML.Result resultRol = BL.Rol.GetAllEFSP();
-                //ML.Result resultEstado = BL.Estado.GetAllEFSP();
-                usuario.Rol.Roles = resultRol.Objects;
-                usuario.Direccion.Colonia.Municipio.Estado.Estados = resultEstado.Objects;
+                IdUsuario = 0;
+            }
+            if (IdUsuario > 0)
+            {
+                //GetById con metodo BL
+                result = _usuario.GetByIdEFSP(IdUsuario.Value);
 
-                // Carga municipios
-                if (usuario.Direccion?.Colonia?.Municipio?.Estado != null && usuario.Direccion.Colonia.Municipio.Estado.IdEstado > 0)
+                if (result.Correct)
                 {
-                    ML.Result resultMunicipio = _municipio.GetByIdEstado(usuario.Direccion.Colonia.Municipio.Estado.IdEstado);
-                    if (resultMunicipio.Correct)
+                    usuario = (ML.Usuario)result.Object;
+
+                    usuario.Rol.Roles = resultRol.Objects;
+                    usuario.Direccion.Colonia.Municipio.Estado.Estados = resultEstado.Objects;
+
+                    // Carga municipios
+                    if (usuario.Direccion?.Colonia?.Municipio?.Estado != null && usuario.Direccion.Colonia.Municipio.Estado.IdEstado > 0)
                     {
-                        usuario.Direccion.Colonia.Municipio.Municipios = resultMunicipio.Objects;
+                        ML.Result resultMunicipio = _municipio.GetByIdEstado(usuario.Direccion.Colonia.Municipio.Estado.IdEstado);
+                        if (resultMunicipio.Correct)
+                        {
+                            usuario.Direccion.Colonia.Municipio.Municipios = resultMunicipio.Objects;
+                        }
                     }
-                }
-                else
-                {
-                    usuario.Direccion.Colonia.Municipio.Municipios = new List<object>();
-                }
-                // Carga colonias
-                if (usuario.Direccion?.Colonia?.Municipio != null && usuario.Direccion.Colonia.Municipio.IdMunicipio > 0)
-                {
-                    ML.Result resultColonia = _colonia.GetByIdMunicipio(usuario.Direccion.Colonia.Municipio.IdMunicipio);
-                    if (resultColonia.Correct)
+                    else
                     {
-                        usuario.Direccion.Colonia.Colonias = resultColonia.Objects;
+                        usuario.Direccion.Colonia.Municipio.Municipios = new List<object>();
                     }
-                }
-                else
-                {
-                    usuario.Direccion.Colonia.Colonias = new List<object>();
+                    // Carga colonias
+                    if (usuario.Direccion?.Colonia?.Municipio != null && usuario.Direccion.Colonia.Municipio.IdMunicipio > 0)
+                    {
+                        ML.Result resultColonia = _colonia.GetByIdMunicipio(usuario.Direccion.Colonia.Municipio.IdMunicipio);
+                        if (resultColonia.Correct)
+                        {
+                            usuario.Direccion.Colonia.Colonias = resultColonia.Objects;
+                        }
+                    }
+                    else
+                    {
+                        usuario.Direccion.Colonia.Colonias = new List<object>();
+                    }
+
                 }
             }
-                return View(usuario);
+
+            else
+            {
+                if (resultRol.Correct)
+                {
+                    usuario.Rol.Roles = resultRol.Objects;
+                }
+
+                if (resultEstado.Correct)
+                {
+                    usuario.Direccion.Colonia.Municipio.Estado.Estados = resultEstado.Objects;
+
+                    // MUNICIPIOS
+                    if (usuario.Direccion.Colonia.Municipio.Estado.IdEstado > 0)
+                    {
+                        ML.Result resultMunicipio = _municipio.GetByIdEstado(usuario.Direccion.Colonia.Municipio.Estado.IdEstado);
+                        usuario.Direccion.Colonia.Municipio.Municipios = resultMunicipio.Objects;
+                    }
+                    else
+                    {
+                        usuario.Direccion.Colonia.Municipio.Municipios = new List<object>();
+                    }
+
+                    // COLONIAS
+                    if (usuario.Direccion.Colonia.Municipio.IdMunicipio > 0)
+                    {
+                        ML.Result resultColonia = _colonia.GetByIdMunicipio(usuario.Direccion.Colonia.Municipio.IdMunicipio);
+                        usuario.Direccion.Colonia.Colonias = resultColonia.Objects;
+                    }
+                    else
+                    {
+                        usuario.Direccion.Colonia.Colonias = new List<object>();
+                    }
+                }
+            }
+            return View(usuario);
         }
         [HttpPost]
         public IActionResult Form()
@@ -130,5 +163,28 @@ namespace PL.Controllers
                 return View();
             }
         }
+        [HttpGet]
+        public JsonResult GetMunicipioByEstado(int IdEstado)
+        {
+            ML.Result resultMunicipios = _municipio.GetByIdEstado(IdEstado);
+            return Json(resultMunicipios);
+        }
+        [HttpGet]
+        public JsonResult GetColoniasByMunicipio(int IdMunicipio)
+        {
+            ML.Result resultColonias = _colonia.GetByIdMunicipio(IdMunicipio);
+            return Json(resultColonias);
+        }
+
+        //[HttpPost]
+        //public JsonResult UpdateStatus(int IdUsuario, bool Status)
+        //{
+        //    ML.Usuario usuario = new ML.Usuario();
+        //    usuario.IdUsuario = IdUsuario;
+        //    usuario.Status = Status;
+
+        //    ML.Result resultStatus = BL.Usuario.UpdateStatus(usuario);
+        //    return Json(new { success = resultStatus.Correct });
+        //}
     }
 }

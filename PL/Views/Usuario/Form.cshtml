@@ -1,5 +1,1020 @@
-﻿@*
+﻿@model ML.Usuario
+
+@*
     For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 *@
 @{
 }
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.12.1/font/bootstrap-icons.min.css">
+<div class="container-fluid d-flex justify-content-center align-items-center">
+    <div class="col-12 col-sm-10 col-md-8 col-lg-9 border px-5 rounded shadow bg-white">
+        <h3 class="text-center m-2">FORMULARIO</h3>
+        @using (Html.BeginForm("Form", "Usuario", FormMethod.Post, new { enctype = "multipart/form-data", onsubmit = "return validarCamposObligatorios();", @id = "formAgregarUsuario" }))
+        {
+            <div class="row mb-3">
+                @Html.HiddenFor(model => model.IdUsuario)
+            </div>
+            <div class="row m-2">
+                @Html.HiddenFor(model => model.Imagen)
+                <div class="text-center">
+                    @if (Model.Imagen != null)
+                    {
+
+                        var base64 = Convert.ToBase64String(Model.Imagen);
+                        var imageScr = String.Format("data:image/*;base64,{0}", base64);
+                        <img src="@imageScr" id="previewImg" style="width:250px">
+                        <div class="d-flex justify-content-center">
+                            <input type="file" class="form-control rounded" name="imgName" id="inputImgFile" onchange="CargarImagen(event)" />
+                        </div>
+                    }
+                    else
+                    {
+                        <img alt="Vista previa" id="previewImg" style="width:250px" src="~/Content/Imagenes/UserDefault.png" />
+                        <div class="d-flex justify-content-center">
+                            <input type="file" class="form-control rounded" name="imgName" id="inputImgFile" onchange="CargarImagen(event)" />
+                        </div>
+                    }
+                </div>
+            </div>
+            @Html.ValidationSummary(false, "", new { @class = "text-danger" })
+            <h4 class="text-center m-5">DATOS DEL USUARIO</h4>
+            <div class="row m-2">
+                <div class="col">
+                    @Html.LabelFor(model => model.Nombre, new { @class = "form-label" })
+                    <div class="d-flex input-group">
+                        <div class="input-group-text">
+                            <i class="bi bi-person p-1"></i>
+                        </div>
+                        @Html.TextBoxFor(model => model.Nombre, new
+                            {
+                                @class = "form-control",
+                                placeholder = "Ingrese su nombre",
+                                id = "txbNombre",
+                                data_obligatorio = "true",
+                                onkeypress = "return ValidarSoloLetras(event);",
+                                oninput = "ValidarSoloLetras(event);",
+                                onblur = "ValidarSoloLetras(event)"
+                            })
+                    </div>
+                    @*<div id="errorTxbNombre" class="text-danger"></div>*@
+                    @Html.ValidationMessageFor(model => model.Nombre, "", new { @class = "text-danger" })
+                    <p hidden="hidden"></p>
+                </div>
+                <div class="col">
+                    @Html.LabelFor(model => model.ApellidoPaterno, "Apellido Paterno", new { @class = "form-label" })
+                    <div class="d-flex input-group">
+                        <div class="input-group-text">
+                            <i class="bi bi-person p-1"></i>
+                        </div>
+                        @Html.TextBoxFor(model => model.ApellidoPaterno, new
+                            {
+                                @class = "form-control",
+                                placeholder = "Ingrese su apellido paterno",
+                                id = "txbApellidoPaterno",
+                                data_obligatorio = "true",
+                                onkeypress = "return ValidarSoloLetras(event);",
+                                oninput = "ValidarSoloLetras(event);",
+                                onblur = "ValidarSoloLetras(event)"
+                            })
+                    </div>
+                    @*<div id="errorTxbApellidoPaterno" class="text-danger"></div>*@
+                    <p hidden="hidden"></p>
+                    @Html.ValidationMessageFor(model => model.ApellidoPaterno, "", new { @class = "text-danger" })
+                </div>
+            </div>
+            <div class="row m-2">
+                <div class="col">
+                    @Html.LabelFor(model => model.ApellidoMaterno, "Apellido Materno", new { @class = "form-label" })
+                    <div class="d-flex input-group">
+                        <div class="input-group-text">
+                            <i class="bi bi-person p-1"></i>
+                        </div>
+                        @Html.TextBoxFor(model => model.ApellidoMaterno, new
+                            {
+                                @class = "form-control",
+                                placeholder = "Ingrese su apellido materno",
+                                id = "txbApellidoMaterno",
+                                onkeypress = "return ValidarSoloLetras(event);",
+                                oninput = "ValidarSoloLetras(event);",
+                                //onblur = "ValidarSoloLetras(event)"
+                            })
+                    </div>
+                    @*<div id="errorTxbApellidoMaterno" class="text-danger"></div>*@
+                    <p hidden="hidden"></p>
+                    @Html.ValidationMessageFor(model => model.ApellidoMaterno, "", new { @class = "text-danger" })
+                </div>
+                <div class="col">
+                    @Html.LabelFor(model => model.UserName, "Username", new { @class = "form-label" })
+                    <div class="d-flex input-group">
+                        <div class="input-group-text">
+                            <i class="bi bi-person-circle p-1"></i>
+                        </div>
+                        @Html.TextBoxFor(model => model.UserName, new
+                            {
+                                @class = "form-control",
+                                placeholder = "Ingrese su username",
+                                id = "txbUserName",
+                                data_obligatorio = "true",
+                                //onkeypress = "validarUserName(errorTxbUserName, this)",
+                                oninput = "validarUserName(event)",
+                                onblur = "validarUserName(event)"
+                            })
+                    </div>
+                    @*<div id="errorTxbUserName" class="text-danger"></div>*@
+                    <p hidden="hidden"></p>
+                    @Html.ValidationMessageFor(model => model.UserName, "", new { @class = "text-danger" })
+                </div>
+            </div>
+            <div class="row m-2 m-2">
+                <div class="col">
+                    @Html.LabelFor(model => model.Email, "Email", new { @class = "form-label" })
+                    <div class="d-flex input-group">
+                        <div class="input-group-text">
+                            <i class="bi bi-envelope-at p-1"></i>
+                        </div>
+                        @Html.TextBoxFor(model => model.Email, new { @class = "form-control", placeholder = "Ingrese su email", data_obligatorio = "true", id = "txbEmail", oninput = "validarEmail(this)", onblur = "validarEmail(this)" })
+                    </div>
+                    @*<div id="errorEmail" class="text-danger"></div>*@
+                    <p hidden="hidden"></p>
+                    @Html.ValidationMessageFor(model => model.Email, "", new { @class = "text-danger" })
+                </div>
+                <div class="col">
+                    @Html.LabelFor(model => model.Email, "Confirma tu email", new { @class = "form-label" })
+                    <div class="d-flex input-group">
+                        <div class="input-group-text">
+                            <i class="bi bi-envelope-at p-1"></i>
+                        </div>
+                        @Html.TextBox("ConfirmarEmail", Model.Email, new { @class = "form-control", placeholder = "Ingrese de nuevo su email", data_obligatorio = "true", id = "txbConfirmarEmail", oninput = "validarEmail(this)", onblur = "validarEmail(this)" })
+                    </div>
+                    <p hidden="hidden"></p>
+                </div>
+            </div>
+
+            <div class="row m-2 m-2">
+                <div class="col">
+                    @Html.LabelFor(model => model.Password, "Contraseña", new { @class = "form-label" })
+                    <div class="d-flex input-group">
+                        <div class="input-group-text">
+                            <i class="bi bi-key p-1"></i>
+                        </div>
+                        @Html.TextBoxFor(model => model.Password, new
+                            {
+                                @class = "form-control",
+                                placeholder = "Ingrese su contraseña",
+                                type = "password",
+                                id = "txbPassword",
+                                data_obligatorio = "true",
+                                oninput = "validarPassword(this)",
+                                onblur = "validarPassword(this)"
+                            })
+                    </div>
+                    @*<div id="errorTxbPassword" class="text-danger"></div>*@
+                    <p hidden="hidden"></p>
+                    @Html.ValidationMessageFor(model => model.Password, "", new { @class = "text-danger" })
+                </div>
+                <div class="col">
+                    @Html.LabelFor(model => model.Password, "Confirma tu contraseña", new { @class = "form-label" })
+                    <div class="d-flex input-group">
+                        <div class="input-group-text">
+                            <i class="bi bi-key p-1"></i>
+                        </div>
+                        @Html.TextBox("ConfirmarPassword", Model.Password, new { @type = "password", @class = "form-control", placeholder = "Ingrese de nuevo su contraseña", data_obligatorio = "true", id = "txbConfirmarPassword", oninput = "validarPassword(this)", onblur = "validarPassword(this)" })
+                    </div>
+                    <p hidden="hidden"></p>
+                </div>
+            </div>
+
+
+            <div class="row m-4">
+                <label class="form-label">Sexo</label>
+                <div class="d-flex col">
+                    <i class="bi bi-gender-male mx-1"></i>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="Sexo" value="M" data-obligatorio="true" @(Model.Sexo?.Trim().ToUpper() == "M" ? "checked" : "") />
+                        <label class="form-check-label">Masculino</label>
+                    </div>
+                </div>
+                <div class="d-flex col">
+                    <i class="bi bi-gender-female mx-1"></i>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="Sexo" value="F" data-obligatorio="true" @(Model.Sexo?.Trim().ToUpper() == "F" ? "checked" : "") />
+                        <label class="form-check-label">Femenino</label>
+                    </div>
+                </div>
+                <div class="d-flex col">
+                    <i class="bi bi-gender-ambiguous mx-1"></i>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="Sexo" value="O" data-obligatorio="true" @(Model.Sexo?.Trim().ToUpper() == "O" ? "checked" : "") />
+                        <label class="form-check-label">Otro</label>
+                    </div>
+                </div>
+                @*<div id="errorSexo" class="text-danger"></div>*@
+                <span hidden="hidden"></span>
+                @Html.ValidationMessageFor(model => model.Sexo, "", new { @class = "text-danger" })
+            </div>
+            <div class="row m-2">
+                <div class="col">
+                    @Html.LabelFor(model => model.FechaNacimiento, new { @class = "form-label" })
+                    <div class="d-flex input-group date" id="datepicker">
+                        @*<div class="input-group date" id="datepicker">*@
+                        <div class="input-group-text"><i class="bi bi-calendar"></i></div>
+                        @Html.TextBoxFor(model => model.FechaNacimiento, new { @class = "form-control", @autocomplete = "off", @id = "fechaNacimiento"@*, @readonly = "readonly"*@, onchange = "validarFecha($(this));" })
+                        @*</div>*@
+                    </div>
+                    <p hidden="hidden"></p>
+                    @Html.ValidationMessageFor(model => model.FechaNacimiento, "", new { @class = "text-danger" })
+                </div>
+                <div class="col">
+                    @Html.LabelFor(model => model.Telefono, new { @class = "form-label" })
+                    <div class="d-flex input-group">
+                        <div class="input-group-text">
+                            <i class="bi bi-telephone p-1"></i>
+                        </div>
+                        @Html.TextBoxFor(model => model.Telefono, new
+                            {
+                                @class = "form-control",
+                                placeholder = "Ingrese su telefono",
+                                id = "txbTelefono",
+                                data_obligatorio = "true",
+                                onkeypress = "ValidarSoloNumeros(event)",
+                                oninput = "ValidarSoloNumeros(event)",
+                                onblur = "ValidarSoloNumeros(event)"
+                            })
+                    </div>
+                    @*<div id="errorTxbTelefono" class="text-danger"></div>*@
+                    <p hidden="hidden"></p>
+                    @Html.ValidationMessageFor(model => model.Telefono, "", new { @class = "text-danger" })
+                </div>
+            </div>
+
+            <div class="row m-2">
+                <div class="col">
+                    @Html.LabelFor(model => model.Celular, new { @class = "form-label" })
+                    <div class="d-flex input-group">
+                        <div class="input-group-text">
+                            <i class="bi bi-phone p-1"></i>
+                        </div>
+                        @Html.TextBoxFor(model => model.Celular, new
+                            {
+                                @class = "form-control",
+                                placeholder = "Ingrese su celular",
+                                id = "txbCelular",
+                                onkeypress = "ValidarSoloNumeros(event)",
+                                oninput = "ValidarSoloNumeros(event)",
+                                //onblur = "ValidarSoloNumeros(event, 'errorCelular')"
+                            })
+                    </div>
+                    @*<div id="errorTxbCelular" class="text-danger"></div>*@
+                    <p hidden="hidden"></p>
+                    @Html.ValidationMessageFor(model => model.Celular, "", new { @class = "text-danger" })
+                </div>
+                <div class="col">
+                    @Html.LabelFor(model => model.CURP, new { @class = "form-label" })
+                    <div class="d-flex input-group">
+                        <div class="input-group-text">
+                            <i class="bi bi-person-vcard p-1"></i>
+                        </div>
+                        @Html.TextBoxFor(model => model.CURP, new { @class = "form-control", placeholder = "Ingrese su CURP", oninput = "validarCURP(this)", onblur = "validarCURP(this)" })
+                    </div>
+                    @*<div id="errorCURP" class="text-danger"></div>*@
+                    <p hidden="hidden"></p>
+                    @Html.ValidationMessageFor(model => model.CURP, "", new { @class = "text-danger" })
+                </div>
+            </div>
+
+            <div class="col m-3">
+                @Html.LabelFor(model => model.Rol.IdRol, "Rol", new { @class = "form-label" })
+                <div class="d-flex input-group">
+                    <div class="input-group-text">
+                        <i class="bi bi-people p-1"></i>
+                    </div>
+                    @Html.DropDownListFor(model => model.Rol.IdRol, new SelectList(Model.Rol.Roles, "IdRol", "Nombre", Model.Rol.IdRol), "Selecciona un rol", new { @class = "form-select", data_obligatorio = "true", id = "ddlRol" })
+                </div>
+                @*<div id="errorDdlRol" class="text-danger"></div>*@
+                <p hidden="hidden"></p>
+                @Html.ValidationMessageFor(model => model.Rol.IdRol, "", new { @class = "text-danger" })
+            </div>
+            <h4 class="text-center m-5">DIRECCIÓN</h4>
+            <div class="row m-2">
+                <div class="col">
+                    @Html.LabelFor(model => model.Direccion.Calle, "Calle", new { @class = "form-label" })
+                    <div class="d-flex input-group">
+                        <div class="input-group-text">
+                            <i class="bi bi-signpost p-1"></i>
+                        </div>
+                        @Html.TextBoxFor(model => model.Direccion.Calle, new
+                            {
+                                @class = "form-control",
+                                placeholder = "Ingrese su Calle",
+                                id = "txbCalle",
+                                data_obligatorio = "true",
+                                oninput = "validarCalle(event)",
+                                onkeypress = "validarCalle(event)",
+                                onblur = "validarCalle(event)"
+                            })
+                    </div>
+                    @*<div class="text-danger" id="errorTxbCalle"></div>*@
+                    @Html.ValidationMessageFor(model => model.Direccion.Calle, "", new { @class = "text-danger" })
+                    <p hidden="hidden"></p>
+                </div>
+                <div class="col">
+                    @Html.LabelFor(model => model.Direccion.NumeroExterior, "Número exterior", new { @class = "form-label" })
+                    <div class="d-flex input-group">
+                        <div class="input-group-text">
+                            <i class="bi bi-house-door p-1"></i>
+                        </div>
+                        @Html.TextBoxFor(model => model.Direccion.NumeroExterior, new { @class = "form-control", placeholder = "Ingrese su # exterior", id = "txbNumExt", data_obligatorio = "true", oninput = "validarNumeroIntExt(event)", onkeypress = "validarNumeroIntExt(event)", onblur = "validarNumeroIntExt(event)" })
+                    </div>
+                    @*<div id="errorTxbNumExt" class="text-danger"></div>*@
+                    @Html.ValidationMessageFor(model => model.Direccion.NumeroExterior, "", new { @class = "text-danger" })
+                    <p hidden="hidden"></p>
+                </div>
+                <div class="col">
+                    @Html.LabelFor(model => model.Direccion.NumeroInterior, "Número interior", new { @class = "form-label" })
+                    <div class="d-flex input-group">
+                        <div class="input-group-text">
+                            <i class="bi bi-door-closed p-1"></i>
+                        </div>
+                        @Html.TextBoxFor(model => model.Direccion.NumeroInterior, new
+                            {
+                                @class = "form-control",
+                                placeholder = "Ingrese su # interior",
+                                id = "txbNumInt",
+                                oninput = "validarNumeroIntExt(event)",
+                                onkeypress = "validarNumeroIntExt(event)"
+                            @*, onblur = "validarNumeroIntExt(event)"*@})
+                    </div>
+                    @*<div id="errorTxbNumInt" class="text-danger"></div>*@
+                    @Html.ValidationMessageFor(model => model.Direccion.NumeroInterior, "", new { @class = "text-danger" })
+                    <p hidden="hidden"></p>
+                </div>
+            </div>
+            <div class="row m-2">
+                <div class="col">
+                    @Html.LabelFor(model => model.Direccion.Colonia.Municipio.Estado.IdEstado, "Estado", new { @class = "form-label" })
+                    <div class="d-flex input-group">
+                        <div class="input-group-text">
+                            <i class="bi bi-geo-alt p-1"></i>
+                        </div>
+                        @Html.DropDownListFor(model => model.Direccion.Colonia.Municipio.Estado.IdEstado, new SelectList(Model.Direccion.Colonia.Municipio.Estado.Estados, "IdEstado", "Nombre"), "Selecciona un estado", new { @class = "form-select", @Id = "ddlEstado", data_obligatorio = "true", @onchange = "FillMunicipios()" })
+                    </div>
+                    @*<div id="errorDdlEstado" class="text-danger"></div>*@
+                    @Html.ValidationMessageFor(model => model.Direccion.Colonia.Municipio.Estado.IdEstado, "", new { @class = "text-danger" })
+                    <p hidden="hidden"></p>
+                </div>
+                <div class="col">
+                    @Html.LabelFor(model => model.Direccion.Colonia.Municipio.IdMunicipio, "Municipio", new { @class = "form-label" })
+                    <div class="d-flex input-group">
+                        <div class="input-group-text">
+                            <i class="bi bi-pin-map p-1"></i>
+                        </div>
+                        @Html.DropDownListFor(model => model.Direccion.Colonia.Municipio.IdMunicipio, new SelectList(Model.Direccion.Colonia.Municipio.Municipios, "IdMunicipio", "Nombre", Model.Direccion.Colonia.Municipio.IdMunicipio), "Seleccione un municipio", new { @class = "form-select", @id = "ddlMunicipio", data_obligatorio = "true", @onchange = "FillColonias()" })
+                    </div>
+                    @*<div id="errorDdlMunicipio" class="text-danger"></div>*@
+                    @Html.ValidationMessageFor(model => model.Direccion.Colonia.Municipio.IdMunicipio, "", new { @class = "text-danger" })
+                    <p hidden="hidden"></p>
+                </div>
+                <div class="col">
+                    @Html.LabelFor(model => model.Direccion.Colonia.IdColonia, "Colonia", new { @class = "form-label" })
+                    <div class="d-flex input-group">
+                        <div class="input-group-text">
+                            <i class="bi bi-houses p-1"></i>
+                        </div>
+                        @Html.DropDownListFor(model => model.Direccion.Colonia.IdColonia, new SelectList(Model.Direccion.Colonia.Colonias, "IdColonia", "Nombre", Model.Direccion.Colonia.IdColonia), "Seleccione una colonia", new { @class = "form-select", @id = "ddlColonia", data_obligatorio = "true" })
+                    </div>
+                    @*<div id="errorDdlColonia" class="text-danger"></div>*@
+                    @Html.ValidationMessageFor(model => model.Direccion.Colonia.IdColonia, "", new { @class = "text-danger" })
+                    <p hidden="hidden"></p>
+                </div>
+            </div>
+            <div class="text-center">
+                <button type="submit" class="btn btn-primary btn-lg m-5">Guardar</button>
+            </div>
+
+        }
+    </div>
+</div>
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
+@*<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>*@
+
+<script>
+    var CargarImagen = function (event) {
+        var input = event.target;
+        var file = input.files[0];
+
+        if (!validar(file?.name)) {
+            input.value = "";
+            $('#previewImg').attr('src', '');
+            return;
+        }
+
+        var reader = new FileReader();
+        reader.onload = function () {
+            var output = $('#previewImg')[0];
+            output.src = reader.result;
+        }
+        reader.readAsDataURL(file);
+    }
+
+    function validar(imgName) {
+        let extensions = ["png", "jpg", "jpeg"];
+        if (!imgName) {
+            alert("No se subió archivo");
+            return false;
+        }
+        let imgExtension = imgName.split('.').pop().toLowerCase();
+        if (!extensions.includes(imgExtension)) {
+            alert("No es un archivo de imagen válido (png, jpg, jpeg)");
+            return false;
+        }
+        return true;
+    }
+
+</script>
+<script>
+    function FillMunicipios() {
+        var IdEstado = $('#ddlEstado').val();
+        console.log(IdEstado)
+        $.ajax({
+            url: '@Url.Action("GetMunicipioByEstado")',
+            dataType: 'JSON',
+            method: 'GET',
+            data: { IdEstado },
+            success: function (resultMunicipios) {
+                console.log(resultMunicipios)
+                if (resultMunicipios.correct) {
+                    $("#ddlMunicipio").empty()
+                    $("#ddlColonia").empty()
+                    $("#ddlMunicipio").append('<option value="">Seleccione un municipio</option>')
+                    $("#ddlColonia").append('<option value="">Seleccione una colonia</option>')
+
+                    $.each(resultMunicipios.objects, function (i, municipio) {
+                        $("#ddlMunicipio").append('<option value = "' + municipio.idMunicipio + '">' + municipio.nombre + '</option>')
+                    })
+                }
+            },
+            error: function (ex) {
+                alert(ex)
+            }
+        })
+    }
+</script>
+<script>
+    function FillColonias() {
+        var IdMunicipio = $('#ddlMunicipio').val();
+        $.ajax({
+            url: '@Url.Action("GetColoniasByMunicipio")',
+            dataType: 'JSON',
+            method: 'GET',
+            data: { IdMunicipio },
+            success: function (resultColonias) {
+                if (resultColonias.correct) {
+
+                    $("#ddlColonia").empty()
+                    $("#ddlColonia").append('<option value="">Seleccione una colonia</option>')
+
+                    $.each(resultColonias.objects, function (i, colonia) {
+                        $("#ddlColonia").append('<option value="' + colonia.idColonia + '">' + colonia.nombre + ' (' + colonia.codigoPostal + ')</option>');
+                    });
+                }
+            }
+        });
+    }
+</script>
+
+@section scripts {
+    <script src="https://code.jquery.com/ui/1.14.1/jquery-ui.min.js"></script>
+    @* <script src="~/Scripts/jquery-ui.min.js"></script> *@
+    <script>
+        $(function () {
+            $("#fechaNacimiento").datepicker({
+                dateFormat: "dd/mm/yy",
+                yearRange: "1900:2025",
+                autoclose: true,
+                todayHighlight: true,
+                changeYear: true,
+                changeMonth: true
+            });
+        });
+    </script>
+}
+<script>
+
+    //Validaciones con regex
+    function ValidarSoloLetras(event) {
+        var $input = $(event.target);
+        var valor = $input.val();
+        var letras = /^[a-zA-ZÁÉÍÓÚáéíóúÑñ\s]*$/;
+        const $errorSpan = $input.parent().parent().find('p');
+
+        if (event.type === "keypress") {
+            var tecla = event.key;
+            var regexLetra = /^[a-zA-ZÁÉÍÓÚáéíóúÑñ\s]$/;
+            if (!regexLetra.test(tecla)) {
+                $errorSpan.text("Solo se permiten letras").addClass('text-danger').removeAttr('hidden');
+                $input.removeClass('is-valid').addClass('is-invalid');
+                event.preventDefault();
+                return false;
+            }
+
+            if (valor.length >= 50) {
+                $errorSpan.text("Máximo 50 caracteres").addClass('text-danger').removeAttr('hidden');
+                $input.removeClass('is-valid').addClass('is-invalid');
+                event.preventDefault();
+                return false;
+            }
+        }
+
+        if (event.type === "input" || event.type === "blur") {
+            if (valor.length > 50) {
+                $input.val(valor.substring(0, 50));
+                $errorSpan.text("Máximo 50 caracteres").addClass('text-danger').removeAttr('hidden');
+                $input.removeClass('is-valid').addClass('is-invalid');
+                return;
+            }
+
+            if (valor.length < 2) {
+                $errorSpan.text("Mínimo 2 caracteres").addClass('text-danger').removeAttr('hidden');
+                $input.removeClass('is-valid').addClass('is-invalid');
+                return;
+            }
+
+            if (letras.test(valor)) {
+                $errorSpan.text('').addClass('text-danger').attr('hidden', 'hidden');
+                $input.removeClass('is-invalid').addClass('is-valid');
+                return;
+            }
+            $errorSpan.text('').attr('hidden', 'hidden');
+            $input.removeClass('is-invalid').addClass('is-valid');
+        }
+    }
+
+
+
+    //Validaciones com ASCII
+    //function ValidarSoloLetras(event) {
+    //    var $input = $(event.target);
+    //    var valor = $input.val();
+    //    const $errorSpan = $input.parent().parent().find('span');
+
+    //    if (event.type === "keypress") {
+    //        var tecla = event.key;
+    //        var codigo = event.which || event.keyCode;
+
+    //        if (
+    //            !(codigo >= 65 && codigo <= 90) && // mayusculas
+    //            !(codigo >= 97 && codigo <= 122) && // minusculas
+    //            codigo !== 32 // espacio
+    //        ) {
+    //            $errorSpan.text("Solo se permiten letras").addClass('text-danger').removeAttr('hidden');
+    //            $input.removeClass('is-valid').addClass('is-invalid');
+    //            event.preventDefault();
+    //            return false;
+    //        }
+
+    //        if (valor.length >= 50) {
+    //            $errorSpan.text("Máximo 50 caracteres").addClass('text-danger').removeAttr('hidden');
+    //            $input.removeClass('is-valid').addClass('is-invalid');
+    //            event.preventDefault();
+    //            return false;
+    //        }
+    //    }
+
+    //    if (event.type === "input" || event.type === "blur") {
+    //        if (valor.length > 50) {
+    //            $input.val(valor.substring(0, 50));
+    //            $errorSpan.text("Máximo 50 caracteres").addClass('text-danger').removeAttr('hidden');
+    //            $input.removeClass('is-valid').addClass('is-invalid');
+    //            return;
+    //        }
+
+    //        if (valor.length < 2) {
+    //            $errorSpan.text("Mínimo 2 caracteres").addClass('text-danger').removeAttr('hidden');
+    //            $input.removeClass('is-valid').addClass('is-invalid');
+    //            return;
+    //        }
+
+    //        for (let i = 0; i < valor.length; i++) {
+    //            let charCode = valor.charCodeAt(i);
+    //            if (
+    //                !((charCode >= 65 && charCode <= 90) || // mayusculas
+    //                    (charCode >= 97 && charCode <= 122) || // minusculas
+    //                    charCode === 32) // espacio
+    //            ) {
+    //                $errorSpan.text("Solo se permiten letras").addClass('text-danger').removeAttr('hidden');
+    //                $input.removeClass('is-valid').addClass('is-invalid');
+    //                return;
+    //            }
+    //        }
+
+    //        $errorSpan.text('').attr('hidden', 'hidden');
+    //        $input.removeClass('is-invalid').addClass('is-valid');
+    //    }
+    //}
+
+
+
+    //Funcion validar numeros con REGEX
+    //function ValidarSoloNumeros(event) {
+    //    var $input = $(event.target);
+    //    var valor = $input.val();
+    //    var tecla = String.fromCharCode(event.which);
+    //    //var $errorDiv = $('#' + errorDivId);
+    //    const $errorSpan = $input.parent().parent().find('span');
+    //    var regexNumero = /^[0-9]$/;
+
+    //    if (event.type === "keypress") {
+    //        if (!regexNumero.test(tecla)) {
+    //            $errorSpan.text("Solo se permiten números").addClass('text-danger').removeAttr('hidden');
+    //            $input.removeClass('is-valid').addClass('is-invalid');
+    //            event.preventDefault();
+    //            return false;
+    //        }
+    //        if (valor.length == 10) {
+    //            $errorSpan.text("Solo se permiten 10 dígitos").addClass('text-danger').removeAttr('hidden');
+    //            $input.removeClass('is-valid').addClass('is-invalid');
+    //            event.preventDefault();
+    //            return false;
+    //        }
+    //    }
+    //    if (event.type === "input" || event.type === "blur") {
+    //        //if (valor.trim() === "") {
+    //        //    $errorDiv.text("Este campo es obligatorio");
+    //        //    $input.removeClass('is-valid').addClass('is-invalid');
+    //        //} else
+    //        if (!/^\d+$/.test(valor)) {
+    //            $errorSpan.text("Solo se permiten números").addClass('text-danger').removeAttr('hidden');
+    //            $input.removeClass('is-valid').addClass('is-invalid');
+    //        } else if (valor.length !== 10) {
+    //            $errorSpan.text("Debe ingresar exactamente 10 dígitos").addClass('text-danger').removeAttr('hidden');
+    //            $input.removeClass('is-valid').addClass('is-invalid');
+    //        } else {
+    //            $errorSpan.text('').addClass('text-danger').attr('hidden', 'hidden');
+    //            $input.removeClass('is-invalid').addClass('is-valid');
+    //        }
+    //    }
+    //}
+
+
+
+    //Funcion validar numeros con ASCII
+    function ValidarSoloNumeros(event) {
+        var $input = $(event.target);
+        var valor = $input.val();
+        const $errorSpan = $input.parent().parent().find('p');
+
+        if (event.type === "keypress") {
+            var codigo = event.which || event.keyCode;
+
+            //numeros del 0 al 9
+            if (codigo < 48 || codigo > 57) {
+                $errorSpan.text("Solo se permiten números").addClass('text-danger').removeAttr('hidden');
+                $input.removeClass('is-valid').addClass('is-invalid');
+                event.preventDefault();
+                return false;
+            }
+
+            if (valor.length >= 10) {
+                $errorSpan.text("Solo se permiten 10 dígitos").addClass('text-danger').removeAttr('hidden');
+                $input.removeClass('is-valid').addClass('is-invalid');
+                event.preventDefault();
+                return false;
+            }
+        }
+
+        if (event.type === "input" || event.type === "blur") {
+            var soloNumeros = true;
+            for (var i = 0; i < valor.length; i++) {
+                var codigo = valor.charCodeAt(i);
+                //numeros del 0 al 9
+                if (codigo < 48 || codigo > 57) {
+                    soloNumeros = false;
+                    break;
+                }
+            }
+
+            if (!soloNumeros) {
+                $errorSpan.text("Solo se permiten números").addClass('text-danger').removeAttr('hidden');
+                $input.removeClass('is-valid').addClass('is-invalid');
+            } else if (valor.length !== 10) {
+                $errorSpan.text("Debe ingresar exactamente 10 dígitos").addClass('text-danger').removeAttr('hidden');
+                $input.removeClass('is-valid').addClass('is-invalid');
+            } else {
+                $errorSpan.text('').attr('hidden', 'hidden');
+                $input.removeClass('is-invalid').addClass('is-valid');
+            }
+        }
+    }
+
+
+
+
+    function validarCalle(event) {
+        var $input = $(event.target);
+        var valor = $input.val();
+        //const $errorSpan = $input.parent().parent().find('span');
+        const $errorSpan = $input.parent().parent().find('p');
+        var regexCaracteresPermitidos = /^[a-zA-Z0-9ÁÉÍÓÚáéíóúÑñ\s.,-]$/;
+        var regexCalle = /^[a-zA-Z0-9ÁÉÍÓÚáéíóúÑñ\s.,-]{3,50}$/;
+        //var $errorDiv = $('#' + errorDivId);
+
+        if (event.type === "keypress") {
+            var tecla = event.key;
+
+            if (!regexCaracteresPermitidos.test(tecla)) {
+                $errorSpan.text("Solo se permiten letras, números, espacios, puntos, comas y guiones").addClass('text-danger').removeAttr('hidden');
+                $input.removeClass('is-valid').addClass('is-invalid');
+                event.preventDefault();
+                return false;
+            }
+            if ($input.val().length >= 50) {
+                event.preventDefault();
+                $errorSpan.text("Máximo 50 caracteres permitidos").addClass('text-danger').removeAttr('hidden');
+                $input.removeClass('is-valid').addClass('is-invalid');
+                return false;
+            }
+        }
+
+        if (event.type === "input" || event.type === "blur") {
+            if (!regexCalle.test(valor)) {
+                $errorSpan.text("La calle debe tener entre 3 y 50 caracteres").addClass('text-danger').removeAttr('hidden');
+                $input.removeClass('is-valid').addClass('is-invalid');
+            }
+            else if (valor.length < 3) {
+                $errorSpan.text("Mínimo 3 caracteres requeridos").addClass('text-danger').removeAttr('hidden');
+                $input.removeClass('is-valid').addClass('is-invalid');
+            }
+            else {
+                $errorSpan.text("").addClass('text-danger').attr('hidden', 'hidden');
+                $input.removeClass('is-invalid').addClass('is-valid');
+            }
+        }
+    }
+
+
+    function validarNumeroIntExt(event) {
+        var $input = $(event.target);
+        var valor = $input.val();
+        var tecla = event.key;
+        var regexTecla = /^[a-zA-Z0-9]$/;
+        const $errorSpan = $input.parent().parent().find('p');
+        //var $errorDiv = $('#' + errorDivId);
+
+        if (event.type === "keypress") {
+            if (!regexTecla.test(tecla)) {
+                $errorSpan.text('Solo se permiten letras y números').addClass('text-danger').removeAttr('hidden');
+                $input.removeClass('is-valid').addClass('is-invalid');
+                event.preventDefault();
+                return false;
+            }
+            if (valor.length >= 20) {
+                $errorSpan.text('Máximo 20 caracteres permitidos').addClass('text-danger').removeAttr('hidden');
+                $input.removeClass('is-valid').addClass('is-invalid');
+                event.preventDefault();
+                return false;
+            }
+        }
+
+        if (event.type === "input" || event.type === "blur") {
+            if (valor.length > 20) {
+                $input.val(valor.substring(0, 20));
+                $errorSpan.text('Máximo 20 caracteres permitidos').addClass('text-danger').removeAttr('hidden');
+                $input.removeClass('is-valid').addClass('is-invalid');
+                return;
+            }
+
+            var regex = /^[a-zA-Z0-9]{1,20}$/;
+
+            if (regex.test(valor)) {
+                $errorSpan.text('').addClass('text-danger').attr('hidden', 'hidden');
+                $input.removeClass('is-invalid').addClass('is-valid');
+            } else {
+                $errorSpan.text("El numero debe tener al menos minimo un caracter").addClass('text-danger').removeAttr('hidden');
+                $input.removeClass('is-valid').addClass('is-invalid');
+            }
+        }
+    }
+    function validarUserName(event) {
+        var $input = $(event.target);
+        var valor = $input.val();
+        var regexUsername = /^[a-zA-Z0-9_.@@#$%-]*$/;
+        const $errorSpan = $input.parent().parent().find('p');
+        //var $errorDiv = $('#' + errorDivId);
+
+        if (event.type === "keypress") {
+            var tecla = event.key;
+            var regexTecla = /^[a-zA-Z0-9_.@@#$%-]$/;
+            if (!regexTecla.test(tecla)) {
+                $errorSpan.text("Caracter no permitido").addClass('text-danger').removeAttr('hidden');
+                $input.removeClass('is-valid').addClass('is-invalid');
+                event.preventDefault();
+                return false;
+            }
+
+            if (valor.length >= 50) {
+                $errorSpan.text("Máximo 50 caracteres").addClass('text-danger').removeAttr('hidden');
+                $input.removeClass('is-valid').addClass('is-invalid');
+                event.preventDefault();
+                return false;
+            }
+        }
+
+        if (event.type === "input" || event.type === "blur") {
+            if (valor.length > 50) {
+                $input.val(valor.substring(0, 50));
+                $errorSpan.text("Máximo 50 caracteres").addClass('text-danger').removeAttr('hidden');
+                $input.removeClass('is-valid').addClass('is-invalid');
+                return;
+            }
+
+            if (valor.length < 4) {
+                $errorSpan.text("Mínimo 4 caracteres").addClass('text-danger').removeAttr('hidden');
+                $input.removeClass('is-valid').addClass('is-invalid');
+                return;
+            }
+
+            if (regexUsername.test(valor)) {
+                $errorSpan.text('').addClass('text-danger').attr('hidden', 'hidden');
+                $input.removeClass('is-invalid').addClass('is-valid');
+            } else {
+                $errorSpan.text("Solo letras, números y caracteres sin espacios").addClass('text-danger').removeAttr('hidden');
+                $input.removeClass('is-valid').addClass('is-invalid');
+            }
+        }
+
+    }
+
+    function validarEmail(input) {
+        var $input = $(input);
+        var valor = $input.val().trim();
+        const $errorSpan = $input.parent().parent().find('p');
+        const id = $input.attr('id');
+
+        var regexEmail = /^[a-zA-Z0-9._%+-]+@@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+
+        if (valor.length > 250) {
+            $errorSpan.text("Máximo 250 caracteres").addClass('text-danger').removeAttr('hidden');
+            $input.val(valor.substring(0, 250));
+            $input.removeClass('is-valid').addClass('is-invalid');
+            return;
+        }
+        else if (!regexEmail.test(valor)) {
+            $errorSpan.text("Ingrese un correo electrónico válido").addClass('text-danger').removeAttr('hidden');
+            $input.removeClass('is-valid').addClass('is-invalid');
+            return;
+        }
+        if (id === 'txbConfirmarEmail') {
+            var email = $('#txbEmail').val().trim();
+            if (valor !== email) {
+                $errorSpan.text("Los correos no coinciden").addClass('text-danger').removeAttr('hidden');
+                $input.removeClass('is-valid').addClass('is-invalid');
+                return;
+            }
+        }
+
+        $errorSpan.text("").addClass('text-danger').attr('hidden', 'hidden');
+        $input.removeClass('is-invalid').addClass('is-valid');
+
+    }
+    $('#txbEmail').on('copy paste cut', function (e) {
+        e.preventDefault();
+    });
+    $('#txbConfirmarEmail').on('copy paste cut', function (e) {
+        e.preventDefault();
+    });
+
+    function validarPassword(input) {
+        var $input = $(input);
+        var valor = $input.val().trim();
+        const $errorSpan = $input.parent().parent().find('p');
+        const id = $input.attr('id');
+
+
+        if ($input.val().length >= 50) {
+            event.preventDefault();
+            $errorSpan.text("Máximo 50 caracteres permitidos").addClass('text-danger').removeAttr('hidden');
+            $input.removeClass('is-valid').addClass('is-invalid');
+            return false;
+        }
+        else if (valor.length < 5) {
+            $errorSpan.text("Mínimo 5 caracteres requeridos").addClass('text-danger').removeAttr('hidden');
+            $input.removeClass('is-valid').addClass('is-invalid');
+            return false;
+        }
+
+        else if (id === 'txbConfirmarPassword') {
+            var password = $('#txbPassword').val().trim();
+            if (valor !== password) {
+                $errorSpan.text("Las contraseñas no coinciden").addClass('text-danger').removeAttr('hidden');
+                $input.removeClass('is-valid').addClass('is-invalid');
+                return false;
+            }
+        }
+        $errorSpan.text("").addClass('text-danger').attr('hidden', 'hidden');
+        $input.removeClass('is-invalid').addClass('is-valid');
+
+    }
+
+
+    function validarCURP(input) {
+        var $input = $(input);
+        var valor = $input.val().toUpperCase().trim();
+        const $errorSpan = $input.parent().parent().find('p');
+        //var $errorDiv = $('#' + errorDivId);
+        var regexCURP = /^[A-Z]{4}\d{6}[HM][A-Z]{5}[0-9A-Z]\d$/;
+
+        if (valor.length !== 18) {
+            $errorSpan.text("La CURP debe tener exactamente 18 caracteres").addClass('text-danger').removeAttr('hidden');
+            $input.removeClass('is-valid').addClass('is-invalid');
+        } else if (!regexCURP.test(valor)) {
+            $errorSpan.text("Formato de CURP inválido").addClass('text-danger').removeAttr('hidden');
+            $input.removeClass('is-valid').addClass('is-invalid');
+        } else {
+            $errorSpan.text("").addClass('text-danger').attr('hidden', 'hidden');
+            $input.removeClass('is-invalid').addClass('is-valid');
+        }
+    }
+
+
+    function validarFecha($input) {
+        const $errorSpan = $input.parent().parent().find('p');
+        const valor = $input.val().trim();
+
+        if (valor === "") {
+            $errorSpan.text("").attr('hidden', 'hidden');
+            $input.removeClass('is-invalid').removeClass('is-valid');
+            return true;
+        }
+
+        const regexFecha = /^(0[1-9]|[12][0-9]|3[01])[\/](0[1-9]|1[0-2])[\/]\d{4}$/;
+
+        if (!regexFecha.test(valor)) {
+            $errorSpan
+                .text("Formato de fecha inválido")
+                .addClass('text-danger')
+                .removeAttr('hidden');
+            $input.removeClass('is-valid').addClass('is-invalid');
+            return false;
+        }
+
+        $errorSpan.text("").attr('hidden', 'hidden');
+        $input.removeClass('is-invalid').addClass('is-valid');
+        return true;
+    }
+
+
+    function validarDropDownList(elemento) {
+        const $errorSpan = ddl.closest('div').parent().find('span');
+
+    }
+
+    function validarCamposObligatorios() {
+        let esValido = true;
+
+        $('[data-obligatorio="true"]').each(function () {
+            const $input = $(this);
+            const tipo = $input.attr('type');
+            const name = $input.attr('name');
+            const valor = $input.val().trim();
+            const $errorSpan = $input.parent().parent().find('p');
+
+            if (tipo === 'radio') {
+                if (!$('input[name="' + name + '"]:checked').val()) {
+                    $errorSpan.text('Este campo es obligatorio').addClass('text-danger').removeAttr('hidden');
+                    esValido = false;
+                } else {
+                    $errorSpan.text('').addClass('text-danger').attr('hidden', 'hidden');
+                }
+            } else {
+                if (valor === '') {
+                    $errorSpan.text('Este campo es obligatorio').addClass('text-danger').removeAttr('hidden');
+                    $input.removeClass('is-valid').addClass('is-invalid');
+                    esValido = false;
+                } else {
+                    if (name === 'ConfirmarPassword') {
+                        const password = $('#txbPassword').val().trim();
+                        if (valor !== password) {
+                            $errorSpan.text('Las contraseñas no coinciden').addClass('text-danger').removeAttr('hidden');
+                            $input.removeClass('is-valid').addClass('is-invalid');
+                            esValido = false;
+                            return;
+                        }
+                    }
+                    if (name === 'ConfirmarEmail') {
+                        const email = $('#txbEmail').val().trim();
+                        if (valor !== email) {
+                            $errorSpan.text('Los correos no coinciden').addClass('text-danger').removeAttr('hidden');
+                            $input.removeClass('is-valid').addClass('is-invalid');
+                            esValido = false;
+                            return;
+                        }
+                    }
+                    $errorSpan.text('').addClass('text-danger').attr('hidden', 'hidden');
+                    $input.removeClass('is-invalid').addClass('is-valid');
+                }
+            }
+        });
+
+        return esValido;
+    }
+</script>

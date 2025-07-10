@@ -102,7 +102,7 @@ namespace BL
 {
                     new SqlParameter("@IdUsuario",IdUsuario)
                 };
-                var query = _context.UsuarioGetAllViews.FromSqlRaw("UsuarioGetById IdUsuario", parametros).FirstOrDefault();
+                var query = _context.UsuarioGetAllViews.FromSqlRaw("UsuarioGetById @IdUsuario", parametros).AsEnumerable().FirstOrDefault();
                 if (query != null)
                 {
                     ML.Usuario usuario = new ML.Usuario();
@@ -192,5 +192,6 @@ namespace BL
             }
             return result;
         }
+
     }
 }

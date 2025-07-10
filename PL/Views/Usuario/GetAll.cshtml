@@ -121,3 +121,27 @@ else
 {
     <p>No se encontro ningun usuario</p>
 }
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
+<script>
+    function UpdateStatus(switchElement) {
+        var checkbox = $(switchElement);
+        var IdUsuario = checkbox.data('id');
+        var Status = checkbox.is(':checked');
+
+        $.ajax({
+            url: '@Url.Action("UpdateStatus", "Usuario")',
+            type: 'POST',
+            data: { IdUsuario: IdUsuario, Status: Status },
+            success: function (response) {
+                if (!response.success) {
+                    alert("Error al cambiar el status");
+                    checkbox.prop('checked', !Status);
+                }
+            },
+            error: function () {
+                alert("Ocurrió un error");
+                checkbox.prop('checked', !Status);
+            }
+        });
+    }
+</script>
