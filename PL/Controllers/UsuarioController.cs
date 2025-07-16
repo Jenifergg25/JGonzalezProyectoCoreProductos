@@ -153,7 +153,7 @@ namespace PL.Controllers
         public IActionResult Delete(int IdUsuario)
         {
             ML.Result result = new ML.Result();
-            result = _usuario.DeleteEFSP(IdUsuario);
+            result = _usuario.DeleteEFSP(IdUsuario); 
             if (result.Correct)
             {
                 return RedirectToAction("GetAll");
