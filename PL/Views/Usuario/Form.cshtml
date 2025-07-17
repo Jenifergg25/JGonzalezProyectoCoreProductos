@@ -9,7 +9,9 @@
 <div class="container-fluid d-flex justify-content-center align-items-center">
     <div class="col-12 col-sm-10 col-md-8 col-lg-9 border px-5 rounded shadow bg-white">
         <h3 class="text-center m-2">FORMULARIO</h3>
-        @using (Html.BeginForm("Form", "Usuario", FormMethod.Post, new { enctype = "multipart/form-data", onsubmit = "return validarCamposObligatorios();", @id = "formAgregarUsuario" }))
+@*         <form asp-action="Form" asp-controller="Usuario" method="post" enctype="multipart/form-data" id="formAgregarUsuario" onsubmit="return validarCamposObligatorios();">
+ *@
+                @using (Html.BeginForm("Form", "Usuario", FormMethod.Post, new { enctype = "multipart/form-data", onsubmit = "return validarCamposObligatorios();", @id = "formAgregarUsuario" }))
         {
             <div class="row mb-3">
                 @Html.HiddenFor(model => model.IdUsuario)
@@ -29,7 +31,7 @@
                     }
                     else
                     {
-                        <img alt="Vista previa" id="previewImg" style="width:250px" src="~/Content/Imagenes/UserDefault.png" />
+                        <img alt="Vista previa" id="previewImg" style="width:250px" src="~/Imagenes/usuarioDefault.png" />
                         <div class="d-flex justify-content-center">
                             <input type="file" class="form-control rounded" name="imgName" id="inputImgFile" onchange="CargarImagen(event)" />
                         </div>
@@ -42,8 +44,8 @@
                 <div class="col">
                     @Html.LabelFor(model => model.Nombre, new { @class = "form-label" })
                     <div class="d-flex input-group">
-                        <div class="input-group-text">
-                            <i class="bi bi-person p-1"></i>
+                        <div class="input-group-text bg-dark text-white">
+                            <i class="bi bi-person p-1 fs-5"></i>
                         </div>
                         @Html.TextBoxFor(model => model.Nombre, new
                             {
@@ -63,8 +65,8 @@
                 <div class="col">
                     @Html.LabelFor(model => model.ApellidoPaterno, "Apellido Paterno", new { @class = "form-label" })
                     <div class="d-flex input-group">
-                        <div class="input-group-text">
-                            <i class="bi bi-person p-1"></i>
+                        <div class="input-group-text bg-dark text-white">
+                            <i class="bi bi-person p-1 fs-5"></i>
                         </div>
                         @Html.TextBoxFor(model => model.ApellidoPaterno, new
                             {
@@ -86,8 +88,8 @@
                 <div class="col">
                     @Html.LabelFor(model => model.ApellidoMaterno, "Apellido Materno", new { @class = "form-label" })
                     <div class="d-flex input-group">
-                        <div class="input-group-text">
-                            <i class="bi bi-person p-1"></i>
+                        <div class="input-group-text bg-dark text-white">
+                            <i class="bi bi-person p-1 fs-5"></i>
                         </div>
                         @Html.TextBoxFor(model => model.ApellidoMaterno, new
                             {
@@ -106,8 +108,8 @@
                 <div class="col">
                     @Html.LabelFor(model => model.UserName, "Username", new { @class = "form-label" })
                     <div class="d-flex input-group">
-                        <div class="input-group-text">
-                            <i class="bi bi-person-circle p-1"></i>
+                        <div class="input-group-text bg-dark text-white">
+                            <i class="bi bi-person-circle p-1 fs-5"></i>
                         </div>
                         @Html.TextBoxFor(model => model.UserName, new
                             {
@@ -129,8 +131,8 @@
                 <div class="col">
                     @Html.LabelFor(model => model.Email, "Email", new { @class = "form-label" })
                     <div class="d-flex input-group">
-                        <div class="input-group-text">
-                            <i class="bi bi-envelope-at p-1"></i>
+                        <div class="input-group-text bg-dark text-white">
+                            <i class="bi bi-envelope-at p-1 fs-5"></i>
                         </div>
                         @Html.TextBoxFor(model => model.Email, new { @class = "form-control", placeholder = "Ingrese su email", data_obligatorio = "true", id = "txbEmail", oninput = "validarEmail(this)", onblur = "validarEmail(this)" })
                     </div>
@@ -141,8 +143,8 @@
                 <div class="col">
                     @Html.LabelFor(model => model.Email, "Confirma tu email", new { @class = "form-label" })
                     <div class="d-flex input-group">
-                        <div class="input-group-text">
-                            <i class="bi bi-envelope-at p-1"></i>
+                        <div class="input-group-text bg-dark text-white">
+                            <i class="bi bi-envelope-at p-1 fs-5"></i>
                         </div>
                         @Html.TextBox("ConfirmarEmail", Model.Email, new { @class = "form-control", placeholder = "Ingrese de nuevo su email", data_obligatorio = "true", id = "txbConfirmarEmail", oninput = "validarEmail(this)", onblur = "validarEmail(this)" })
                     </div>
@@ -154,8 +156,8 @@
                 <div class="col">
                     @Html.LabelFor(model => model.Password, "Contraseña", new { @class = "form-label" })
                     <div class="d-flex input-group">
-                        <div class="input-group-text">
-                            <i class="bi bi-key p-1"></i>
+                        <div class="input-group-text bg-dark text-white">
+                            <i class="bi bi-key p-1 fs-5"></i>
                         </div>
                         @Html.TextBoxFor(model => model.Password, new
                             {
@@ -175,8 +177,8 @@
                 <div class="col">
                     @Html.LabelFor(model => model.Password, "Confirma tu contraseña", new { @class = "form-label" })
                     <div class="d-flex input-group">
-                        <div class="input-group-text">
-                            <i class="bi bi-key p-1"></i>
+                        <div class="input-group-text bg-dark text-white">
+                            <i class="bi bi-key p-1 fs-5"></i>
                         </div>
                         @Html.TextBox("ConfirmarPassword", Model.Password, new { @type = "password", @class = "form-control", placeholder = "Ingrese de nuevo su contraseña", data_obligatorio = "true", id = "txbConfirmarPassword", oninput = "validarPassword(this)", onblur = "validarPassword(this)" })
                     </div>
@@ -188,28 +190,28 @@
             <div class="row m-4">
                 <label class="form-label">Sexo</label>
                 <div class="d-flex col">
-                    <i class="bi bi-gender-male mx-1"></i>
+                    <i class="bi bi-gender-male mx-1 text-primary fs-3"></i>
                     <div class="form-check">
-                        <input class="form-check-input" type="radio" name="Sexo" value="M" data-obligatorio="true" @(Model.Sexo?.Trim().ToUpper() == "M" ? "checked" : "") />
+                        <input class="form-check-input" type="radio" name="Sexo" value="M" data-obligatorio="true" onchange="validarRadio(this)" @(Model.Sexo?.Trim().ToUpper() == "M" ? "checked" : "") />
                         <label class="form-check-label">Masculino</label>
                     </div>
                 </div>
                 <div class="d-flex col">
-                    <i class="bi bi-gender-female mx-1"></i>
+                    <i class="bi bi-gender-female mx-1 text-danger fs-3"></i>
                     <div class="form-check">
-                        <input class="form-check-input" type="radio" name="Sexo" value="F" data-obligatorio="true" @(Model.Sexo?.Trim().ToUpper() == "F" ? "checked" : "") />
+                        <input class="form-check-input" type="radio" name="Sexo" value="F" data-obligatorio="true" onchange="validarRadio(this)" @(Model.Sexo?.Trim().ToUpper() == "F" ? "checked" : "") />
                         <label class="form-check-label">Femenino</label>
                     </div>
                 </div>
                 <div class="d-flex col">
-                    <i class="bi bi-gender-ambiguous mx-1"></i>
+                    <i class="bi bi-gender-ambiguous mx-1 text-secondary fs-3"></i>
                     <div class="form-check">
-                        <input class="form-check-input" type="radio" name="Sexo" value="O" data-obligatorio="true" @(Model.Sexo?.Trim().ToUpper() == "O" ? "checked" : "") />
+                        <input class="form-check-input" type="radio" name="Sexo" value="O" data-obligatorio="true" onchange="validarRadio(this)" @(Model.Sexo?.Trim().ToUpper() == "O" ? "checked" : "") />
                         <label class="form-check-label">Otro</label>
                     </div>
                 </div>
                 @*<div id="errorSexo" class="text-danger"></div>*@
-                <span hidden="hidden"></span>
+                <span hidden="hidden" id="errorSexo"></span>
                 @Html.ValidationMessageFor(model => model.Sexo, "", new { @class = "text-danger" })
             </div>
             <div class="row m-2">
@@ -217,8 +219,14 @@
                     @Html.LabelFor(model => model.FechaNacimiento, new { @class = "form-label" })
                     <div class="d-flex input-group date" id="datepicker">
                         @*<div class="input-group date" id="datepicker">*@
-                        <div class="input-group-text"><i class="bi bi-calendar"></i></div>
-                        @Html.TextBoxFor(model => model.FechaNacimiento, new { @class = "form-control", @autocomplete = "off", @id = "fechaNacimiento"@*, @readonly = "readonly"*@, onchange = "validarFecha($(this));" })
+                        <div class="input-group-text bg-dark text-white"><i class="bi bi-calendar fs-5"></i></div>
+                        @Html.TextBoxFor(model => model.FechaNacimiento, new
+                            {
+                                @class = "form-control",
+                                @autocomplete = "off",
+                                @id = "fechaNacimiento"@*, @readonly = "readonly"*@,
+                                onchange = "validarFecha($(this));"
+                            })
                         @*</div>*@
                     </div>
                     <p hidden="hidden"></p>
@@ -227,8 +235,8 @@
                 <div class="col">
                     @Html.LabelFor(model => model.Telefono, new { @class = "form-label" })
                     <div class="d-flex input-group">
-                        <div class="input-group-text">
-                            <i class="bi bi-telephone p-1"></i>
+                        <div class="input-group-text bg-dark text-white">
+                            <i class="bi bi-telephone p-1 fs-5"></i>
                         </div>
                         @Html.TextBoxFor(model => model.Telefono, new
                             {
@@ -251,8 +259,8 @@
                 <div class="col">
                     @Html.LabelFor(model => model.Celular, new { @class = "form-label" })
                     <div class="d-flex input-group">
-                        <div class="input-group-text">
-                            <i class="bi bi-phone p-1"></i>
+                        <div class="input-group-text bg-dark text-white">
+                            <i class="bi bi-phone p-1 fs-5"></i>
                         </div>
                         @Html.TextBoxFor(model => model.Celular, new
                             {
@@ -271,8 +279,8 @@
                 <div class="col">
                     @Html.LabelFor(model => model.CURP, new { @class = "form-label" })
                     <div class="d-flex input-group">
-                        <div class="input-group-text">
-                            <i class="bi bi-person-vcard p-1"></i>
+                        <div class="input-group-text bg-dark text-white">
+                            <i class="bi bi-person-vcard p-1 fs-5"></i>
                         </div>
                         @Html.TextBoxFor(model => model.CURP, new { @class = "form-control", placeholder = "Ingrese su CURP", oninput = "validarCURP(this)", onblur = "validarCURP(this)" })
                     </div>
@@ -285,10 +293,10 @@
             <div class="col m-3">
                 @Html.LabelFor(model => model.Rol.IdRol, "Rol", new { @class = "form-label" })
                 <div class="d-flex input-group">
-                    <div class="input-group-text">
-                        <i class="bi bi-people p-1"></i>
+                    <div class="input-group-text bg-dark text-white">
+                        <i class="bi bi-people p-1 fs-5"></i>
                     </div>
-                    @Html.DropDownListFor(model => model.Rol.IdRol, new SelectList(Model.Rol.Roles, "IdRol", "Nombre", Model.Rol.IdRol), "Selecciona un rol", new { @class = "form-select", data_obligatorio = "true", id = "ddlRol" })
+                    @Html.DropDownListFor(model => model.Rol.IdRol, new SelectList(Model.Rol.Roles, "IdRol", "Nombre", Model.Rol.IdRol), "Selecciona un rol", new { @class = "form-select", data_obligatorio = "true", id = "ddlRol", @onchange = "validarDropDownList(this);" })
                 </div>
                 @*<div id="errorDdlRol" class="text-danger"></div>*@
                 <p hidden="hidden"></p>
@@ -299,7 +307,7 @@
                 <div class="col">
                     @Html.LabelFor(model => model.Direccion.Calle, "Calle", new { @class = "form-label" })
                     <div class="d-flex input-group">
-                        <div class="input-group-text">
+                        <div class="input-group-text bg-dark text-white">
                             <i class="bi bi-signpost p-1"></i>
                         </div>
                         @Html.TextBoxFor(model => model.Direccion.Calle, new
@@ -320,8 +328,8 @@
                 <div class="col">
                     @Html.LabelFor(model => model.Direccion.NumeroExterior, "Número exterior", new { @class = "form-label" })
                     <div class="d-flex input-group">
-                        <div class="input-group-text">
-                            <i class="bi bi-house-door p-1"></i>
+                        <div class="input-group-text bg-dark text-white">
+                            <i class="bi bi-house-door p-1 fs-5"></i>
                         </div>
                         @Html.TextBoxFor(model => model.Direccion.NumeroExterior, new { @class = "form-control", placeholder = "Ingrese su # exterior", id = "txbNumExt", data_obligatorio = "true", oninput = "validarNumeroIntExt(event)", onkeypress = "validarNumeroIntExt(event)", onblur = "validarNumeroIntExt(event)" })
                     </div>
@@ -332,8 +340,8 @@
                 <div class="col">
                     @Html.LabelFor(model => model.Direccion.NumeroInterior, "Número interior", new { @class = "form-label" })
                     <div class="d-flex input-group">
-                        <div class="input-group-text">
-                            <i class="bi bi-door-closed p-1"></i>
+                        <div class="input-group-text bg-dark text-white">
+                            <i class="bi bi-door-closed p-1 fs-5"></i>
                         </div>
                         @Html.TextBoxFor(model => model.Direccion.NumeroInterior, new
                             {
@@ -353,10 +361,10 @@
                 <div class="col">
                     @Html.LabelFor(model => model.Direccion.Colonia.Municipio.Estado.IdEstado, "Estado", new { @class = "form-label" })
                     <div class="d-flex input-group">
-                        <div class="input-group-text">
-                            <i class="bi bi-geo-alt p-1"></i>
+                        <div class="input-group-text bg-dark text-white">
+                            <i class="bi bi-geo-alt p-1 fs-5"></i>
                         </div>
-                        @Html.DropDownListFor(model => model.Direccion.Colonia.Municipio.Estado.IdEstado, new SelectList(Model.Direccion.Colonia.Municipio.Estado.Estados, "IdEstado", "Nombre"), "Selecciona un estado", new { @class = "form-select", @Id = "ddlEstado", data_obligatorio = "true", @onchange = "FillMunicipios()" })
+                        @Html.DropDownListFor(model => model.Direccion.Colonia.Municipio.Estado.IdEstado, new SelectList(Model.Direccion.Colonia.Municipio.Estado.Estados, "IdEstado", "Nombre"), "Selecciona un estado", new { @class = "form-select", @Id = "ddlEstado", @onchange = "FillMunicipios(); validarDropDownList(this);" })
                     </div>
                     @*<div id="errorDdlEstado" class="text-danger"></div>*@
                     @Html.ValidationMessageFor(model => model.Direccion.Colonia.Municipio.Estado.IdEstado, "", new { @class = "text-danger" })
@@ -365,10 +373,10 @@
                 <div class="col">
                     @Html.LabelFor(model => model.Direccion.Colonia.Municipio.IdMunicipio, "Municipio", new { @class = "form-label" })
                     <div class="d-flex input-group">
-                        <div class="input-group-text">
-                            <i class="bi bi-pin-map p-1"></i>
+                        <div class="input-group-text bg-dark text-white">
+                            <i class="bi bi-pin-map p-1 fs-5"></i>
                         </div>
-                        @Html.DropDownListFor(model => model.Direccion.Colonia.Municipio.IdMunicipio, new SelectList(Model.Direccion.Colonia.Municipio.Municipios, "IdMunicipio", "Nombre", Model.Direccion.Colonia.Municipio.IdMunicipio), "Seleccione un municipio", new { @class = "form-select", @id = "ddlMunicipio", data_obligatorio = "true", @onchange = "FillColonias()" })
+                        @Html.DropDownListFor(model => model.Direccion.Colonia.Municipio.IdMunicipio, new SelectList(Model.Direccion.Colonia.Municipio.Municipios, "IdMunicipio", "Nombre", Model.Direccion.Colonia.Municipio.IdMunicipio), "Seleccione un municipio", new { @class = "form-select", @id = "ddlMunicipio", @onchange = "FillColonias(); validarDropDownList(this);" })
                     </div>
                     @*<div id="errorDdlMunicipio" class="text-danger"></div>*@
                     @Html.ValidationMessageFor(model => model.Direccion.Colonia.Municipio.IdMunicipio, "", new { @class = "text-danger" })
@@ -377,10 +385,10 @@
                 <div class="col">
                     @Html.LabelFor(model => model.Direccion.Colonia.IdColonia, "Colonia", new { @class = "form-label" })
                     <div class="d-flex input-group">
-                        <div class="input-group-text">
-                            <i class="bi bi-houses p-1"></i>
+                        <div class="input-group-text bg-dark text-white">
+                            <i class="bi bi-houses p-1 fs-5"></i>
                         </div>
-                        @Html.DropDownListFor(model => model.Direccion.Colonia.IdColonia, new SelectList(Model.Direccion.Colonia.Colonias, "IdColonia", "Nombre", Model.Direccion.Colonia.IdColonia), "Seleccione una colonia", new { @class = "form-select", @id = "ddlColonia", data_obligatorio = "true" })
+                        @Html.DropDownListFor(model => model.Direccion.Colonia.IdColonia, new SelectList(Model.Direccion.Colonia.Colonias, "IdColonia", "Nombre", Model.Direccion.Colonia.IdColonia), "Seleccione una colonia", new { @class = "form-select", @id = "ddlColonia", @onchange = "validarDropDownList(this);" })
                     </div>
                     @*<div id="errorDdlColonia" class="text-danger"></div>*@
                     @Html.ValidationMessageFor(model => model.Direccion.Colonia.IdColonia, "", new { @class = "text-danger" })
@@ -391,11 +399,14 @@
                 <button type="submit" class="btn btn-primary btn-lg m-5">Guardar</button>
             </div>
 
-        }
+        } 
+@*         </form> *@
     </div>
 </div>
+
 <script src="~/lib/jquery/dist/jquery.min.js"></script>
 @*<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>*@
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <script>
     var CargarImagen = function (event) {
@@ -404,7 +415,7 @@
 
         if (!validar(file?.name)) {
             input.value = "";
-            $('#previewImg').attr('src', '');
+            //$('#previewImg').attr('src', '');
             return;
         }
 
@@ -419,12 +430,26 @@
     function validar(imgName) {
         let extensions = ["png", "jpg", "jpeg"];
         if (!imgName) {
-            alert("No se subió archivo");
+            //alert("No se subió archivo");
+            Swal.fire({
+                title: 'Aviso',
+                text: 'No se subió archivo.',
+                icon: 'warning',
+                confirmButtonColor: '#3085d6',
+                confirmButtonText: 'OK'
+            });
             return false;
         }
         let imgExtension = imgName.split('.').pop().toLowerCase();
         if (!extensions.includes(imgExtension)) {
-            alert("No es un archivo de imagen válido (png, jpg, jpeg)");
+            //alert("No es un archivo de imagen válido (png, jpg, jpeg)");
+            Swal.fire({
+                title: 'Archivo invalido',
+                text: 'No es un formato de imagen válido (png, jpg, jpeg).',
+                icon: 'error',
+                confirmButtonColor: '#d33',
+                confirmButtonText: 'OK'
+            });
             return false;
         }
         return true;
@@ -963,9 +988,29 @@
     }
 
 
-    function validarDropDownList(elemento) {
-        const $errorSpan = ddl.closest('div').parent().find('span');
+    function validarDropDownList(element) {
+        //const $errorSpan = ddl.closest('div').parent().find('span');
+        const $select = $(element);
+        const valor = $select.val();
+        var $errorSpan = $select.closest('.input-group').next('p');
+        if (valor && valor !== "") {
+            $select.removeClass('is-invalid').addClass('is-valid');
+            $errorSpan.text("").attr('hidden', 'hidden');
+        } else {
+            $select.removeClass('is-valid');
+        }
+    }
+    $('select').change(function () {
+        validarDropDownList(this);
+    });
 
+    function validarRadio(radio) {
+        const name = radio.name;
+        $('#error' + name).text('').attr('hidden', 'hidden');
+
+        $('input[name="' + name + '"]').each(function () {
+            $(this).removeClass('is-invalid').addClass('is-valid');
+        });
     }
 
     function validarCamposObligatorios() {
@@ -979,11 +1024,11 @@
             const $errorSpan = $input.parent().parent().find('p');
 
             if (tipo === 'radio') {
-                if (!$('input[name="' + name + '"]:checked').val()) {
-                    $errorSpan.text('Este campo es obligatorio').addClass('text-danger').removeAttr('hidden');
+                if ($('input[name="' + name + '"]:checked').length === 0) {
+                    $('#error' + name).text('Este campo es obligatorio').addClass('text-danger').removeAttr('hidden');
                     esValido = false;
                 } else {
-                    $errorSpan.text('').addClass('text-danger').attr('hidden', 'hidden');
+                    $('#error' + name).text('').addClass('text-danger').attr('hidden', 'hidden');
                 }
             } else {
                 if (valor === '') {

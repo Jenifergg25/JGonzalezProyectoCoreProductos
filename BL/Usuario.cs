@@ -163,6 +163,119 @@ namespace BL
             }
             return result;
         }
+        public ML.Result AddEFSP(ML.Usuario Usuario)
+        {
+            ML.Result result = new ML.Result();
+            try
+            {
+                var parametros = new[]
+                {
+            new SqlParameter("@Nombre", Usuario.Nombre ?? (object)DBNull.Value),
+            new SqlParameter("@Telefono", Usuario.Telefono ?? (object)DBNull.Value),
+            new SqlParameter("@UserName", Usuario.UserName ?? (object)DBNull.Value),
+            new SqlParameter("@ApellidoPaterno", Usuario.ApellidoPaterno ?? (object)DBNull.Value),
+            new SqlParameter("@ApellidoMaterno", Usuario.ApellidoMaterno ?? (object)DBNull.Value),
+            new SqlParameter("@Email", Usuario.Email ?? (object)DBNull.Value),
+            new SqlParameter("@Password", Usuario.Password ?? (object)DBNull.Value),
+            new SqlParameter("@Sexo", Usuario.Sexo ?? (object)DBNull.Value),
+            new SqlParameter("@Celular", Usuario.Celular ?? (object)DBNull.Value),
+            new SqlParameter("@FechaNacimiento", Usuario.FechaNacimiento ?? (object)DBNull.Value),
+            new SqlParameter("@CURP", Usuario.CURP ?? (object)DBNull.Value),
+            new SqlParameter("@IdRol", Usuario.Rol.IdRol),
+            new SqlParameter("@Calle", Usuario.Direccion.Calle ?? (object)DBNull.Value),
+            new SqlParameter("@NumeroInterior", Usuario.Direccion.NumeroInterior ?? (object)DBNull.Value),
+            new SqlParameter("@NumeroExterior", Usuario.Direccion.NumeroExterior ?? (object)DBNull.Value),
+            new SqlParameter("@IdColonia", (object?)Usuario.Direccion.Colonia.IdColonia ?? DBNull.Value),
+            new SqlParameter
+            {
+                ParameterName = "@Imagen",
+                SqlDbType = SqlDbType.VarBinary,
+                Value = Usuario.Imagen != null ? (object)Usuario.Imagen : DBNull.Value
+            }
+
+        };
+
+                var query = _context.Database.ExecuteSqlRaw(
+                    "UsuarioAdd @Nombre, @Telefono, @UserName, @ApellidoPaterno, @ApellidoMaterno, " +
+                    "@Email, @Password, @Sexo, @Celular, @FechaNacimiento, @CURP, @IdRol, " +
+                    "@Calle, @NumeroInterior, @NumeroExterior, @IdColonia, @Imagen",
+                    parametros);
+
+                if (query > 0)
+                {
+                    result.Correct = true;
+                }
+                else
+                {
+                    result.Correct = false;
+                    result.ErrorMessage = "Error al insertar";
+                }
+            }
+            catch (Exception ex)
+            {
+                result.Correct = false;
+                result.ErrorMessage = ex.Message;
+                result.Ex = ex;
+            }
+
+            return result;
+        }
+        public ML.Result UpdateEFSP(ML.Usuario usuario)
+        {
+            ML.Result result = new ML.Result();
+
+            try
+            {
+                var parametros = new[]
+                {
+            new SqlParameter("@IdUsuario", usuario.IdUsuario),
+            new SqlParameter("@Nombre", usuario.Nombre ?? (object)DBNull.Value),
+            new SqlParameter("@Telefono", usuario.Telefono ?? (object)DBNull.Value),
+            new SqlParameter("@UserName", usuario.UserName ?? (object)DBNull.Value),
+            new SqlParameter("@ApellidoPaterno", usuario.ApellidoPaterno ?? (object)DBNull.Value),
+            new SqlParameter("@ApellidoMaterno", usuario.ApellidoMaterno ?? (object)DBNull.Value),
+            new SqlParameter("@Email", usuario.Email ?? (object)DBNull.Value),
+            new SqlParameter("@Password", usuario.Password ?? (object)DBNull.Value),
+            new SqlParameter("@Sexo", usuario.Sexo ?? (object)DBNull.Value),
+            new SqlParameter("@Celular", usuario.Celular ?? (object)DBNull.Value),
+            new SqlParameter("@FechaNacimiento", usuario.FechaNacimiento ?? (object)DBNull.Value),
+            new SqlParameter("@CURP", usuario.CURP ?? (object)DBNull.Value),
+            new SqlParameter("@IdRol", usuario.Rol.IdRol),
+            new SqlParameter("@Calle", usuario.Direccion.Calle ?? (object)DBNull.Value),
+            new SqlParameter("@NumeroInterior", usuario.Direccion.NumeroInterior ?? (object)DBNull.Value),
+            new SqlParameter("@NumeroExterior", usuario.Direccion.NumeroExterior ?? (object)DBNull.Value),
+            new SqlParameter("@IdColonia", (object?)usuario.Direccion.Colonia.IdColonia ?? DBNull.Value),
+            new SqlParameter
+            {
+                ParameterName = "@Imagen",
+                SqlDbType = SqlDbType.VarBinary,
+                Value = usuario.Imagen != null ? (object)usuario.Imagen : DBNull.Value
+            }
+        };
+
+                var query = _context.Database.ExecuteSqlRaw(
+                    "UsuarioUpdate @IdUsuario, @Nombre, @Telefono, @UserName, @ApellidoPaterno, @ApellidoMaterno, " +
+                    "@Email, @Password, @Sexo, @Celular, @FechaNacimiento, @CURP, @IdRol, @Calle, @NumeroInterior, " +
+                    "@NumeroExterior, @IdColonia, @Imagen",
+                    parametros
+                );
+
+                result.Correct = query > 0;
+
+                if (!result.Correct)
+                {
+                    result.ErrorMessage = "Error al actualizar el usuario";
+                }
+            }
+            catch (Exception ex)
+            {
+                result.Correct = false;
+                result.ErrorMessage = ex.Message;
+                result.Ex = ex;
+            }
+
+            return result;
+        }
 
         public ML.Result DeleteEFSP(int IdUsuario)
         {

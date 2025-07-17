@@ -35,14 +35,7 @@ namespace BL
                     foreach (var itemColonia in query)
                     {
                         ML.Colonia colonia = new ML.Colonia();
-                        if (colonia.IdColonia == null)
-                        {
-                            colonia.IdColonia = 0;
-                        }
-                        else
-                        {
-                            colonia.IdColonia = itemColonia.IdColonia;
-                        }
+                        colonia.IdColonia = itemColonia.IdColonia;
                         colonia.Nombre = itemColonia.Colonia ?? "";
                         colonia.CodigoPostal = itemColonia.CodigoPostal ?? "";
 
