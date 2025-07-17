@@ -8,7 +8,7 @@ namespace PL.Controllers
         {
             return View();
         }
-        [HttpGet]
+        [HttpGet] 
         public IActionResult GetAll()
         {
             return View();
