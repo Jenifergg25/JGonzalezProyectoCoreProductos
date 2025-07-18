@@ -31,7 +31,7 @@ namespace BL
                     new SqlParameter("@ApellidoMaterno", usuarioParametros.ApellidoMaterno),
                     new SqlParameter("@IdRol", usuarioParametros.Rol?.IdRol)
                 };
-                var query = _context.UsuarioGetAllViews.FromSqlRaw("UsuarioGetAllView @Nombre, @ApellidoPaterno, @ApellidoMaterno, @IdRol", parametros).ToList(); 
+                var query = _context.UsuarioViews.FromSqlRaw("UsuarioGetAllView @Nombre, @ApellidoPaterno, @ApellidoMaterno, @IdRol", parametros).ToList(); 
                 if (query.Count > 0)
                 {
                     foreach (var itemUsuario in query)
@@ -102,7 +102,7 @@ namespace BL
 {
                     new SqlParameter("@IdUsuario",IdUsuario)
                 };
-                var query = _context.UsuarioGetAllViews.FromSqlRaw("UsuarioGetById @IdUsuario", parametros).AsEnumerable().FirstOrDefault();
+                var query = _context.UsuarioViews.FromSqlRaw("UsuarioGetById @IdUsuario", parametros).AsEnumerable().FirstOrDefault();
                 if (query != null)
                 {
                     ML.Usuario usuario = new ML.Usuario();

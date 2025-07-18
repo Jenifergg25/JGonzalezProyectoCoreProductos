@@ -21,7 +21,7 @@ namespace BL
             ML.Result result = new ML.Result();
             try
             {
-                var query = _context.EstadoGetAll.FromSqlRaw("EstadoGetAll").ToList();
+                var query = _context.Estados.FromSqlRaw("EstadoGetAll").ToList();
                 result.Objects = new List<object>();
                 if (query.Count > 0)
                 {
@@ -29,7 +29,7 @@ namespace BL
                     {
                         ML.Estado estado = new ML.Estado();
                         estado.IdEstado = itemEstado.IdEstado;
-                        estado.Nombre = itemEstado.Estado;
+                        estado.Nombre = itemEstado.Nombre;
 
                         result.Objects.Add(estado);
                     }

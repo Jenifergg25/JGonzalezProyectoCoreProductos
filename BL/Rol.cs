@@ -21,7 +21,7 @@ namespace BL
             ML.Result result = new ML.Result();
             try
             {
-                var query = _context.RolGetAll.FromSqlRaw("RolGetAll").ToList();
+                var query = _context.Rols.FromSqlRaw("RolGetAll").ToList();
                 result.Objects = new List<object>();
                 if (query.Count > 0)
                 {
@@ -29,7 +29,7 @@ namespace BL
                     {
                         ML.Rol rol = new ML.Rol();
                         rol.IdRol = itemRol.IdRol;
-                        rol.Nombre = itemRol.Rol;
+                        rol.Nombre = itemRol.Nombre;
 
                         result.Objects.Add(rol);
                     }

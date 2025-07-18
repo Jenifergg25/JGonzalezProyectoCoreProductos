@@ -27,7 +27,7 @@ namespace BL
 {
                     new SqlParameter("@IdEstado",IdEstado)
                 };
-                var query = _context.MunicipioGetByIdEstado.FromSqlRaw("MunicipioGetByIdEstado @IdEstado", parametros).ToList();
+                var query = _context.Municipios.FromSqlRaw("MunicipioGetByIdEstado @IdEstado", parametros).ToList();
                 result.Objects = new List<object>();
 
                 if (query != null && query.Count > 0)
@@ -36,7 +36,7 @@ namespace BL
                     {
                         ML.Municipio municipio = new ML.Municipio();
                         municipio.IdMunicipio = item.IdMunicipio;
-                        municipio.Nombre = item.Municipio ?? "";
+                        municipio.Nombre = item.Nombre ?? "";
 
                         result.Objects.Add(municipio);
                     }

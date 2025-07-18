@@ -15,6 +15,8 @@ public partial class JgonzalezProgramacionNcapasContext : DbContext
     {
     }
 
+    public virtual DbSet<Categorium> Categoria { get; set; }
+
     public virtual DbSet<Colonium> Colonia { get; set; }
 
     public virtual DbSet<Direccion> Direccions { get; set; }
@@ -23,23 +25,33 @@ public partial class JgonzalezProgramacionNcapasContext : DbContext
 
     public virtual DbSet<Municipio> Municipios { get; set; }
 
+    public virtual DbSet<Producto> Productos { get; set; }
+
+    public virtual DbSet<ProductoView> ProductoViews { get; set; }
+
     public virtual DbSet<Rol> Rols { get; set; }
+
+    public virtual DbSet<SubCategorium> SubCategoria { get; set; }
 
     public virtual DbSet<Usuario> Usuarios { get; set; }
 
     public virtual DbSet<UsuarioView> UsuarioViews { get; set; }
-    public virtual DbSet<UsuarioGetAllView> UsuarioGetAllViews { get; set; }
-    public virtual DbSet<RolGetAll> RolGetAll { get; set; }
-    public virtual DbSet<EstadoGetAll> EstadoGetAll { get; set; }
-    public virtual DbSet<MunicipioGetByIdEstado> MunicipioGetByIdEstado { get; set; }
-    public virtual DbSet<ColoniaGetByIdIdMunicipio> ColoniaGetByIdIdMunicipio { get; set; }
 
-    //    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-    //#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see https://go.microsoft.com/fwlink/?LinkId=723263.
-    //        => optionsBuilder.UseSqlServer("Server=.; Database=JGonzalezProgramacionNCapas; TrustServerCertificate=True; User ID=sa; Password=pass@word1;");
+//    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+//#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see https://go.microsoft.com/fwlink/?LinkId=723263.
+//        => optionsBuilder.UseSqlServer("Server=.; Database=JGonzalezProgramacionNCapas; TrustServerCertificate=True; User ID=sa; Password=pass@word1;");
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        modelBuilder.Entity<Categorium>(entity =>
+        {
+            entity.HasKey(e => e.IdCategoria).HasName("PK__Categori__A3C02A10B6BCECB9");
+
+            entity.Property(e => e.Nombre)
+                .HasMaxLength(100)
+                .IsUnicode(false);
+        });
+
         modelBuilder.Entity<Colonium>(entity =>
         {
             entity.HasKey(e => e.IdColonia).HasName("PK__Colonia__A1580F66705945F4");
@@ -111,6 +123,46 @@ public partial class JgonzalezProgramacionNcapasContext : DbContext
                 .HasConstraintName("FK__Municipio__IdEst__1ED998B2");
         });
 
+        modelBuilder.Entity<Producto>(entity =>
+        {
+            entity.HasKey(e => e.IdProducto).HasName("PK__Producto__09889210C825DC35");
+
+            entity.ToTable("Producto");
+
+            entity.Property(e => e.Descripcion)
+                .HasMaxLength(500)
+                .IsUnicode(false);
+            entity.Property(e => e.Nombre)
+                .HasMaxLength(100)
+                .IsUnicode(false);
+            entity.Property(e => e.Precio).HasColumnType("decimal(10, 2)");
+
+            entity.HasOne(d => d.IdSubCategoriaNavigation).WithMany(p => p.Productos)
+                .HasForeignKey(d => d.IdSubCategoria)
+                .HasConstraintName("FK__Producto__IdSubC__619B8048");
+        });
+
+        modelBuilder.Entity<ProductoView>(entity =>
+        {
+            entity
+                .HasNoKey()
+                .ToView("ProductoView");
+
+            entity.Property(e => e.Categoria)
+                .HasMaxLength(100)
+                .IsUnicode(false);
+            entity.Property(e => e.Descripcion)
+                .HasMaxLength(100)
+                .IsUnicode(false);
+            entity.Property(e => e.Precio).HasColumnType("decimal(18, 0)");
+            entity.Property(e => e.Producto)
+                .HasMaxLength(100)
+                .IsUnicode(false);
+            entity.Property(e => e.Subcategoria)
+                .HasMaxLength(100)
+                .IsUnicode(false);
+        });
+
         modelBuilder.Entity<Rol>(entity =>
         {
             entity.HasKey(e => e.IdRol).HasName("PK__Rol__2A49584C6173348B");
@@ -120,6 +172,19 @@ public partial class JgonzalezProgramacionNcapasContext : DbContext
             entity.Property(e => e.Nombre)
                 .HasMaxLength(20)
                 .IsUnicode(false);
+        });
+
+        modelBuilder.Entity<SubCategorium>(entity =>
+        {
+            entity.HasKey(e => e.IdSubCategoria).HasName("PK__SubCateg__0A1EFFE52B922D65");
+
+            entity.Property(e => e.Nombre)
+                .HasMaxLength(100)
+                .IsUnicode(false);
+
+            entity.HasOne(d => d.IdCategoriaNavigation).WithMany(p => p.SubCategoria)
+                .HasForeignKey(d => d.IdCategoria)
+                .HasConstraintName("FK__SubCatego__IdCat__5EBF139D");
         });
 
         modelBuilder.Entity<Usuario>(entity =>
@@ -237,26 +302,6 @@ public partial class JgonzalezProgramacionNcapasContext : DbContext
                 .IsUnicode(false);
         });
 
-        modelBuilder.Entity<UsuarioGetAllView>(entity =>
-        {
-            entity.HasNoKey();
-        });
-        modelBuilder.Entity<RolGetAll>(entity =>
-        {
-            entity.HasNoKey();
-        });
-        modelBuilder.Entity<EstadoGetAll>(entity =>
-        {
-            entity.HasNoKey();
-        });
-        modelBuilder.Entity<MunicipioGetByIdEstado>(entity =>
-        {
-            entity.HasNoKey();
-        });
-        modelBuilder.Entity<ColoniaGetByIdIdMunicipio>(entity =>
-        {
-            entity.HasNoKey();
-        });
         OnModelCreatingPartial(modelBuilder);
     }
 

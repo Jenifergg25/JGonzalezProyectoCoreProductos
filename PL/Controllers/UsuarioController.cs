@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using ML;
+using Newtonsoft.Json;
+using System.Net.Http.Headers;
 
 namespace PL.Controllers
 {
@@ -14,14 +16,16 @@ namespace PL.Controllers
         private readonly BL.Estado _estado;
         private readonly BL.Municipio _municipio;
         private readonly BL.Colonia _colonia;
+        private readonly string _usuarioEndPoint;
 
-        public UsuarioController(BL.Usuario usuario, BL.Rol rol, BL.Estado estado, BL.Municipio municipio, BL.Colonia colonia)
+        public UsuarioController(BL.Usuario usuario, BL.Rol rol, BL.Estado estado, BL.Municipio municipio, BL.Colonia colonia, IConfiguration configuration)
         {
             _usuario = usuario;
             _rol = rol;
             _estado = estado;
             _municipio = municipio;
             _colonia = colonia;
+            _usuarioEndPoint = configuration["ApiSettings:UsuarioEndPoint"];
         }
         [HttpGet]
         public IActionResult GetAll()
@@ -33,21 +37,20 @@ namespace PL.Controllers
             usuario.ApellidoMaterno = "";
             usuario.Rol.IdRol = 0;
             //Funcion GetAll con BL
-            ML.Result result = _usuario.GetAll(usuario);
+            //ML.Result result = _usuario.GetAll(usuario);
 
-            /*
+            
             //GetAll con SOAP
-            usuario = GetAllSOAP(usuario);
-            if (usuario == null)
-            {
-                usuario = new ML.Usuario();
-                usuario.Rol = new ML.Rol();
-            }
+            //usuario = GetAllSOAP(usuario);
+            //if (usuario == null)
+            //{
+            //    usuario = new ML.Usuario();
+            //    usuario.Rol = new ML.Rol();
+            //}
 
 
             //GetAll con REST
-            //result = GetAllREST();
-            */
+            ML.Result result = GetAllREST();
 
             if (result.Correct)
             {
@@ -66,7 +69,7 @@ namespace PL.Controllers
         }
 
         [HttpPost]
-        public IActionResult GetAll(ML.Usuario usuario/*, string tipoArchivo, HttpPostedFileBase archivo, string guardarErrores, string cargarCorrectos*/)
+        public IActionResult GetAll(ML.Usuario usuario)
         {
             usuario.Nombre = usuario.Nombre ?? "";
             usuario.ApellidoPaterno = usuario.ApellidoPaterno ?? "";
@@ -89,6 +92,12 @@ namespace PL.Controllers
 
             //GetAll con capa BL
             ML.Result result = _usuario.GetAll(usuario);
+
+            //Busqueda abierta con REST
+            //ML.Result result = new ML.Result();
+            //result = BusquedaAbiertaREST(usuario);
+
+
             if (result.Correct)
             {
                 usuario.Usuarios = result.Objects;
@@ -160,7 +169,11 @@ namespace PL.Controllers
             if (IdUsuario > 0)
             {
                 //GetById con metodo BL
-                result = _usuario.GetByIdEFSP(IdUsuario.Value);
+                //result = _usuario.GetByIdEFSP(IdUsuario.Value);
+
+                //GetById con REST
+                result = GetByIdREST(IdUsuario.Value);
+
 
                 if (result.Correct)
                 {
@@ -296,11 +309,19 @@ namespace PL.Controllers
 
             if (usuario.IdUsuario > 0)
             {
-                result = _usuario.UpdateEFSP(usuario);
+                //Metodo Update consumido con BL
+                //result = _usuario.UpdateEFSP(usuario);
+
+                //Metodo Update consumido con REST
+                result = UpdateREST(usuario);
             }
             else
             {
-                result = _usuario.AddEFSP(usuario);
+                //Metodo Add consumido con BL
+                result = AddREST(usuario);
+
+                //Metodo Add consumido con REST
+                //result = _usuario.AddEFSP(usuario);
             }
 
             if (result.Correct)
@@ -376,5 +397,275 @@ namespace PL.Controllers
         //    ML.Result resultStatus = BL.Usuario.UpdateStatus(usuario);
         //    return Json(new { success = resultStatus.Correct });
         //}
+        [NonAction]
+        private ML.Result GetAllREST()
+        {
+            ML.Result result = new ML.Result();
+            result.Objects = new List<object>();
+
+            try
+            {
+                using (var client = new HttpClient())
+                {
+                    string endPoint = _usuarioEndPoint.ToString();
+                    //string endPoint = "http://localhost:5253/api/Usuario/";
+                    client.BaseAddress = new Uri(endPoint);
+
+                    client.DefaultRequestHeaders.Accept.Clear();
+                    client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+
+                    var responseTask = client.GetAsync("GetAll");
+                    responseTask.Wait();
+
+                    HttpResponseMessage response = responseTask.Result;
+
+                    if (response.IsSuccessStatusCode)
+                    {
+                        var readTask = response.Content.ReadAsAsync<ML.Result>();
+                        readTask.Wait();
+                        result = readTask.Result;
+                        if (result.Objects != null)
+                        {
+                            var listaUsuarios = new List<ML.Usuario>();
+                            foreach (var itemUsuario in result.Objects)
+                            {
+                                var json = itemUsuario.ToString();
+
+                                ML.Usuario usuario = JsonConvert.DeserializeObject<ML.Usuario>(json);
+                                listaUsuarios.Add(usuario);
+                            }
+                            result.Objects = listaUsuarios.Cast<object>().ToList();
+                        }
+                    }
+                    else
+                    {
+                        result.Correct = false;
+                        result.ErrorMessage = "Error al obtener usuarios";
+                    }
+                    /*
+                    if (response.IsSuccessStatusCode)
+                    {
+                        var readTask = response.Content.ReadAsAsync<ML.Result>();
+                        readTask.Wait();
+
+                        foreach (var resultItem in readTask.Result.Objects)
+                        {
+                            ML.Usuario resultItemList = Newtonsoft.Json.JsonConvert.DeserializeObject<ML.Usuario>(resultItem.ToString());
+                            result.Objects.Add(resultItemList);
+                        }
+                    }
+                    else
+                    {
+                        result.Correct = false;
+                        result.ErrorMessage = "Error al obtener usuarios";
+                    }
+                    */
+                }
+            }
+            catch (Exception ex)
+            {
+                result.Correct = false;
+                result.ErrorMessage = ex.Message;
+            }
+
+            return result;
+        }
+        [NonAction]
+        private ML.Result BusquedaAbiertaREST(ML.Usuario usuario)
+        {
+            ML.Result result = new ML.Result();
+
+            try
+            {
+                using (var client = new HttpClient())
+                {
+                    string endPoint = _usuarioEndPoint.ToString();
+                    client.BaseAddress = new Uri(endPoint);
+
+                    client.DefaultRequestHeaders.Accept.Clear();
+                    client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+
+                    var postTask = client.PostAsJsonAsync("BusquedaAbierta", usuario);
+                    postTask.Wait();
+
+                    HttpResponseMessage response = postTask.Result;
+
+                    if (response.IsSuccessStatusCode)
+                    {
+                        var readTask = response.Content.ReadAsAsync<ML.Result>();
+                        readTask.Wait();
+                        result = readTask.Result;
+
+                        var listaUsuarios = new List<ML.Usuario>();
+                        foreach (var itemUsuario in result.Objects)
+                        {
+                            var json = itemUsuario.ToString();
+
+                            ML.Usuario usuarios = JsonConvert.DeserializeObject<ML.Usuario>(json);
+                            listaUsuarios.Add(usuarios);
+                        }
+                        result.Objects = listaUsuarios.Cast<object>().ToList();
+                    }
+                    else
+                    {
+                        result.Correct = false;
+                        result.ErrorMessage = $"HTTP Error: {response.StatusCode}";
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                result.Correct = false;
+                result.ErrorMessage = ex.Message;
+            }
+
+            return result;
+        }
+        [NonAction]
+        private ML.Result GetByIdREST(int idUsuario)
+        {
+            ML.Result result = new ML.Result();
+
+            try
+            {
+                using (var client = new HttpClient())
+                {
+                    string endPoint = _usuarioEndPoint.ToString();
+                    client.BaseAddress = new Uri(endPoint);
+
+                    client.DefaultRequestHeaders.Accept.Clear();
+                    client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+
+                    var responseTask = client.GetAsync($"GetById/{idUsuario}");
+                    responseTask.Wait();
+
+                    HttpResponseMessage response = responseTask.Result;
+
+                    if (response.IsSuccessStatusCode)
+                    {
+                        var readTask = response.Content.ReadAsAsync<ML.Result>();
+                        readTask.Wait();
+                        result = readTask.Result;
+                        if (result.Object != null)
+                        {
+                            string json = result.Object.ToString();
+                            result.Object = JsonConvert.DeserializeObject<ML.Usuario>(json);
+                        }
+                    }
+                    else
+                    {
+                        result.Correct = false;
+                        result.ErrorMessage = $"HTTP Error: {response.StatusCode}";
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                result.Correct = false;
+                result.ErrorMessage = ex.Message;
+            }
+
+            return result;
+        }
+        [NonAction]
+        private ML.Result UpdateREST(ML.Usuario usuario)
+        {
+            if (usuario.Imagen == null)
+            {
+                usuario.ImagenBase64 = "";
+            }
+            else
+            {
+                usuario.ImagenBase64 = Convert.ToBase64String(usuario.Imagen);
+                //usuario.Imagen = new byte[0];
+            }
+            ML.Result result = new ML.Result();
+            try
+            {
+                using (var client = new HttpClient())
+                {
+                    string endPoint = _usuarioEndPoint.ToString();
+                    client.BaseAddress = new Uri(endPoint);
+
+                    client.DefaultRequestHeaders.Accept.Clear();
+                    client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                    var putTask = client.PutAsJsonAsync($"Update/{usuario.IdUsuario}", usuario);
+                    putTask.Wait();
+
+                    HttpResponseMessage response = putTask.Result;
+
+                    if (response.IsSuccessStatusCode)
+                    {
+                        var readTask = response.Content.ReadAsAsync<ML.Result>();
+                        readTask.Wait();
+                        result = readTask.Result;
+                    }
+                    else
+                    {
+                        result.Correct = false;
+                        result.ErrorMessage = $"Error HTTP: {response.StatusCode}";
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                result.Correct = false;
+                result.ErrorMessage = ex.Message;
+                result.Ex = ex;
+            }
+            return result;
+        }
+        [NonAction]
+        private ML.Result AddREST(ML.Usuario usuario)
+        {
+            ML.Result result = new ML.Result();
+            if (usuario.Imagen == null)
+            {
+                usuario.ImagenBase64 = "";
+            }
+            else
+            {
+                usuario.ImagenBase64 = Convert.ToBase64String(usuario.Imagen);
+                usuario.Imagen = new byte[0];
+            }
+            //usuario.ImagenBase64 = Convert.ToBase64String(usuario.Imagen);
+            //usuario.Imagen = new byte[0];
+
+            try
+            {
+                using (var client = new HttpClient())
+                {
+                    string endPoint = _usuarioEndPoint.ToString();
+                    client.BaseAddress = new Uri(endPoint);
+
+                    client.DefaultRequestHeaders.Accept.Clear();
+                    client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                    var postTask = client.PostAsJsonAsync("Add", usuario);
+                    postTask.Wait();
+
+                    var response = postTask.Result;
+
+                    if (response.IsSuccessStatusCode)
+                    {
+                        var readTask = response.Content.ReadAsAsync<ML.Result>();
+                        readTask.Wait();
+                        result = readTask.Result;
+                    }
+                    else
+                    {
+                        result.Correct = false;
+                        result.ErrorMessage = $"Error HTTP: {response.StatusCode}";
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                result.Correct = false;
+                result.ErrorMessage = ex.Message;
+                result.Ex = ex;
+            }
+            return result;
+
+        }
     }
 }

@@ -27,7 +27,7 @@ namespace BL
 {
                     new SqlParameter("@IdMunicipio",IdMUnicipio)
                 };
-                var query = _context.ColoniaGetByIdIdMunicipio.FromSqlRaw("ColoniaGetByIdIdMunicipio @IdMunicipio", parametros).ToList();
+                var query = _context.Colonia.FromSqlRaw("ColoniaGetByIdIdMunicipio @IdMunicipio", parametros).ToList();
                 result.Objects = new List<object>();
 
                 if (query != null)
@@ -36,7 +36,7 @@ namespace BL
                     {
                         ML.Colonia colonia = new ML.Colonia();
                         colonia.IdColonia = itemColonia.IdColonia;
-                        colonia.Nombre = itemColonia.Colonia ?? "";
+                        colonia.Nombre = itemColonia.Nombre ?? "";
                         colonia.CodigoPostal = itemColonia.CodigoPostal ?? "";
 
                         result.Objects.Add(colonia);
