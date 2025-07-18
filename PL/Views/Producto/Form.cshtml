@@ -1,7 +1,7 @@
 ﻿@model ML.Producto
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.12.1/font/bootstrap-icons.min.css">
-<div class="container-fluid d-flex justify-content-center align-items-center">
-    <div class="col-12 col-sm-10 col-md-8 col-lg-9 border px-5 rounded shadow bg-white">
+<div class="container-fluid d-flex justify-content-center align-items-center mt-5 mb-5 pt-4 pb-4">
+<div class="col-12 col-sm-10 col-md-8 col-lg-8 border p-4 rounded-4 shadow-lg bg-white">
         <h3 class="text-center m-2">FORMULARIO</h3>
 
         @using (Html.BeginForm("Form", "Producto", FormMethod.Post, new { enctype = "multipart/form-data", onsubmit = "return validarCamposObligatorios();", @id = "formAgregarProducto" }))
@@ -111,7 +111,7 @@
                     @Html.LabelFor(model => model.SubCategoria.Categoria.IdCategoria, "Categoria", new { @class = "form-label" })
                     <div class="d-flex input-group">
                         <div class="input-group-text bg-dark text-white">
-                            <i class="bi bi-people p-1 fs-5"></i>
+                            <i class="bi bi-collection p-1 fs-5"></i>
                         </div>
                         @Html.DropDownListFor(model => model.SubCategoria.Categoria.IdCategoria, 
                             new SelectList(Model.SubCategoria.Categoria.Categorias, "IdCategoria", "Nombre", Model.SubCategoria.Categoria.IdCategoria), "Selecciona una categoria",
@@ -125,43 +125,48 @@
                     @Html.LabelFor(model => model.SubCategoria.IdSubCategoria, "SubCategoria", new { @class = "form-label" })
                     <div class="d-flex input-group">
                         <div class="input-group-text bg-dark text-white">
-                            <i class="bi bi-people p-1 fs-5"></i>
+                            <i class="bi bi-tag p-1 fs-5"></i>
                         </div>
                         @Html.DropDownListFor(model => model.SubCategoria.IdSubCategoria,
                                  new SelectList(Model.SubCategoria.SubCategorias, "IdSubCategoria", "Nombre", Model.SubCategoria.IdSubCategoria), "Selecciona una subcategoria",
-                                 new { @class = "form-select", data_obligatorio = "true", id = "ddlSubCategoria"/* , @onchange = "validarDropDownList(this);" */ })
+                                 new { @class = "form-select", data_obligatorio = "true", id = "ddlSubcategoria"/* , @onchange = "validarDropDownList(this);" */ })
                     </div>
                     <p hidden="hidden"></p>
                     @Html.ValidationMessageFor(model => model.SubCategoria.IdSubCategoria, "", new { @class = "text-danger" })
                 </div>
+            </div>
+            <div class="text-center mt-3">
+            <button type="submit" class="btn btn-dark w-25 mt-4">
+                <i class="bi bi-save me-2"></i> Guardar producto
+            </button>
             </div>
         }
 
     </div>
 </div>
 
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
+
+
 <script>
-    $(document).ready(function () {
-        $("#ddlCategoria").change(function () {
-            var idCategoria = $(this).val();
-            $("#ddlSubcategoria").empty();
-            $("#ddlSubcategoria").append('<option value="">Cargando...</option>');
+$('#ddlCategoria').change(function () {
+    var idCategoria = $(this).val();
 
-            if (idCategoria !== "") {
-                $.ajax({
-                    url: '@Url.Action("GetSubcategorias", "Producto")',
-                    type: 'GET',
-                    data: { idCategoria: idCategoria },
-                    success: function (data) {
-                        $("#ddlSubcategoria").empty();
-                        $("#ddlSubcategoria").append('<option value="">Seleccione una subcategoría</option>');
-
-                        $.each(data, function (i, sub) {
-                            $("#ddlSubcategoria").append('<option value="' + sub.idSubCategoria + '">' + sub.nombre + '</option>');
-                        });
-                    }
+    if (idCategoria !== "") {
+        $.ajax({
+            url: '/Producto/GetSubcategorias',
+            type: 'GET',
+            data: { idCategoria: idCategoria },
+            success: function (data) {
+                var ddlSubcategoria = $('#ddlSubcategoria');
+                ddlSubcategoria.empty();
+                ddlSubcategoria.append('<option value="">Selecciona una subcategoría</option>');
+                $.each(data, function (i, subcategoria) {
+                    ddlSubcategoria.append('<option value="' + subcategoria.idSubCategoria + '">' + subcategoria.nombre + '</option>');
                 });
             }
         });
-    });
+    }
+});
+
 </script>

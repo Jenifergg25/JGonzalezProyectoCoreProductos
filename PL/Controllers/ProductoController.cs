@@ -86,34 +86,21 @@ namespace PL.Controllers
             producto.SubCategoria.Categoria = new ML.Categoria();
 
             ML.Result resultCategorias = _categoria.GetAll();
-            if (resultCategorias.Correct)
-            {
-                producto.SubCategoria.Categoria.Categorias = resultCategorias.Objects;
-            }
-            else
-            {
-                producto.SubCategoria.Categoria.Categorias = new List<object>();
-            }
+            producto.SubCategoria.Categoria.Categorias = resultCategorias.Correct ? resultCategorias.Objects : new List<object>();
 
-            if (IdProducto != null && IdProducto > 0)
+            if (IdProducto != null && IdProducto > 0) 
             {
                 ML.Result resultProducto = _producto.GetById(IdProducto.Value);
-                if (resultProducto.Correct && resultProducto.Object != null)
+                if (resultProducto.Correct) 
                 {
-                    producto = (ML.Producto)resultProducto.Object;
+                    ML.Producto productos = (ML.Producto)resultProducto.Object;
 
-                    if (producto.SubCategoria.Categoria.IdCategoria > 0)
-                    {
-                        ML.Result resultSubCategorias = _subCategoria.GetByIdCategoria(producto.SubCategoria.Categoria.IdCategoria);
-                        if (resultSubCategorias.Correct)
-                        {
-                            producto.SubCategoria.SubCategorias = resultSubCategorias.Objects;
-                        }
-                        else
-                        {
-                            producto.SubCategoria.SubCategorias = new List<object>();
-                        }
-                    }
+                    productos.SubCategoria.Categoria.Categorias = producto.SubCategoria.Categoria.Categorias;
+
+                    ML.Result resultSubCategorias = _subCategoria.GetByIdCategoria(productos.SubCategoria.Categoria.IdCategoria);
+                    productos.SubCategoria.SubCategorias = resultSubCategorias.Correct ? resultSubCategorias.Objects : new List<object>();
+
+                    producto = productos;
                 }
             }
             else
