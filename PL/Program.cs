@@ -11,6 +11,9 @@ builder.Services.AddScoped<BL.Rol>();
 builder.Services.AddScoped<BL.Estado>();
 builder.Services.AddScoped<BL.Municipio>();
 builder.Services.AddScoped<BL.Colonia>();
+builder.Services.AddScoped<BL.Producto>();
+builder.Services.AddScoped<BL.Categoria>();
+builder.Services.AddScoped<BL.SubCategoria>();
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
