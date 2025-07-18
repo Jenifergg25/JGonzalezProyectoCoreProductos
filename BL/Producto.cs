@@ -3,6 +3,7 @@ using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -96,6 +97,36 @@ namespace BL
                 result.Ex = ex;
             }
             return result;
+        }
+        public ML.Result Add(ML.Producto producto)
+        {
+            ML.Result result = new ML.Result();
+            try
+            {
+                var parametros = new[]
+                {
+                    new SqlParameter("@Nombre", producto.Nombre ?? ""),
+                    new SqlParameter("@Precio", SqlDbType.Decimal) { Value = producto.Precio },
+                    new SqlParameter("@Descripcion", producto.Descripcion ?? ""),
+                    new SqlParameter("@Imagen", SqlDbType.VarBinary)
+                    {
+                        Value = (object?)producto.Imagen ?? DBNull.Value
+                    },
+                    new SqlParameter("@IdSubCategoria", producto.SubCategoria.IdSubCategoria)
+                };
+                var query = _context.Database.ExecuteSqlRaw("ProductoAdd @Nombre, @Descripcion, @Precio, @Imagen, @IdSubCategoria", parametros);
+                if (query > 0)
+                {
+                    result.Correct = true;
+                }
+            }
+            catch (Exception ex)
+            {
+                result.Correct = false;
+                result.ErrorMessage = ex.Message;
+                result.Ex = ex;
+            }
+            return result;  
         }
     }
 }

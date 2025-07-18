@@ -110,6 +110,63 @@ namespace PL.Controllers
 
             return View(producto);
         }
+        [HttpPost]
+        public IActionResult Form(ML.Producto producto, IFormFile imgName)
+        {
+            if (imgName != null && imgName.Length > 0)
+            {
+                using (var memoryStream = new MemoryStream())
+                {
+                    imgName.CopyTo(memoryStream); 
+                    producto.Imagen = memoryStream.ToArray(); 
+                }
+            }
+            producto.SubCategoria ??= new ML.SubCategoria();
+            producto.SubCategoria.Categoria ??= new ML.Categoria();
+
+            ML.Result resultCategorias = _categoria.GetAll();
+            if (resultCategorias.Correct)
+            {
+                producto.SubCategoria.Categoria.Categorias = resultCategorias.Objects;
+            }
+            else
+            {
+                producto.SubCategoria.Categoria.Categorias = new List<object>();
+            }
+
+            // Update
+            if (producto.IdProducto > 0)
+            {
+            }
+            // Add
+            else 
+            {
+                ML.Result resultAdd = _producto.Add(producto);
+                if (resultAdd.Correct)
+                {
+                    return RedirectToAction("GetAll");
+                }
+            }
+
+            if (producto.SubCategoria.Categoria.IdCategoria > 0)
+            {
+                ML.Result resultSubCategorias = _subCategoria.GetByIdCategoria(producto.SubCategoria.Categoria.IdCategoria);
+                if (resultSubCategorias.Correct)
+                {
+                    producto.SubCategoria.SubCategorias = resultSubCategorias.Objects;
+                }
+                else
+                {
+                    producto.SubCategoria.SubCategorias = new List<object>();
+                }
+            }
+            else
+            {
+                producto.SubCategoria.SubCategorias = new List<object>();
+            }
+
+            return View(producto);
+        }
 
         [HttpGet]
         public JsonResult GetSubcategorias(int idCategoria)
