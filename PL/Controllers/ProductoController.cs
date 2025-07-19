@@ -167,6 +167,22 @@ namespace PL.Controllers
 
             return View(producto);
         }
+        [HttpGet]
+        public IActionResult Delete(int idProducto)
+        {
+            ML.Result result = _producto.Delete(idProducto);
+
+            if (result.Correct)
+            {
+                TempData["Mensaje"] = "Producto eliminado correctamente.";
+                return RedirectToAction("GetAll");
+            } 
+            else
+            {
+                TempData["Mensaje"] = result.ErrorMessage;
+                return RedirectToAction("GetAll");
+            }
+        }
 
         [HttpGet]
         public JsonResult GetSubcategorias(int idCategoria)

@@ -128,5 +128,25 @@ namespace BL
             }
             return result;  
         }
+        public ML.Result Delete(int idProducto)
+        {
+            ML.Result result = new ML.Result();
+
+            try
+            {
+                var query = _context.Database.ExecuteSqlRaw("ProductoDelete @IdProducto", new SqlParameter("@IdProducto", idProducto));
+                if (query > 0)
+                {
+                    result.Correct = true;
+                }
+            }
+            catch (Exception ex)
+            {
+                result.Correct = false;
+                result.ErrorMessage = ex.Message;
+                result.Ex = ex;
+            }
+            return result;
+        }
     }
 }
