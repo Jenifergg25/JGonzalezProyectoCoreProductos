@@ -128,6 +128,37 @@ namespace BL
             }
             return result;  
         }
+        public ML.Result Update(ML.Producto producto)
+        {
+            ML.Result result = new ML.Result();
+            try
+            {
+                var parametros = new[]
+                {
+                    new SqlParameter("@IdProducto", producto.IdProducto),
+                    new SqlParameter("@Nombre", producto.Nombre ?? ""),
+                    new SqlParameter("@Precio", SqlDbType.Decimal) { Value = producto.Precio },
+                    new SqlParameter("@Descripcion", producto.Descripcion ?? ""),
+                    new SqlParameter("@Imagen", SqlDbType.VarBinary)
+                    {
+                        Value = (object?)producto.Imagen ?? DBNull.Value
+                    },
+                    new SqlParameter("@IdSubCategoria", producto.SubCategoria.IdSubCategoria)
+                };
+                var query = _context.Database.ExecuteSqlRaw("ProductoUpdate @IdProducto, @Nombre, @Descripcion, @Precio, @Imagen, @IdSubCategoria", parametros);
+                if (query > 0)
+                {
+                    result.Correct = true;
+                }
+            }
+            catch (Exception ex)
+            {
+                result.Correct = false;
+                result.ErrorMessage = ex.Message;
+                result.Ex = ex;
+            }
+            return result;
+        }
         public ML.Result Delete(int idProducto)
         {
             ML.Result result = new ML.Result();

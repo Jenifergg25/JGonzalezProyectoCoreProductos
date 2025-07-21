@@ -133,21 +133,21 @@ namespace PL.Controllers
             {
                 producto.SubCategoria.Categoria.Categorias = new List<object>();
             }
-
+            ML.Result result = new ML.Result();
             // Update
             if (producto.IdProducto > 0)
             {
+                result = _producto.Update(producto); 
             }
             // Add
             else 
-            {
-                ML.Result resultAdd = _producto.Add(producto);
-                if (resultAdd.Correct)
-                {
-                    return RedirectToAction("GetAll");
-                }
+            { 
+                result = _producto.Add(producto);
             }
-
+            if (result.Correct)
+            {
+                return RedirectToAction("GetAll");
+            }
             if (producto.SubCategoria.Categoria.IdCategoria > 0)
             {
                 ML.Result resultSubCategorias = _subCategoria.GetByIdCategoria(producto.SubCategoria.Categoria.IdCategoria);

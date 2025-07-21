@@ -21,7 +21,7 @@
         @using (Html.BeginForm("GetAll", "Producto", FormMethod.Post))
         {
             <div class="row">
-                <div class="col-md-6">
+                <div class="col-md-5">
                     @Html.LabelFor(m => m.SubCategoria.Categoria.IdCategoria)
                     @Html.DropDownListFor(
                              m => m.SubCategoria.Categoria.IdCategoria,
@@ -30,7 +30,7 @@
                              new { @class = "form-select", id = "ddlCategoria" })
                 </div>
 
-                <div class="col-md-6">
+                <div class="col-md-5">
                     @Html.LabelFor(m => m.SubCategoria.IdSubCategoria)
                     @Html.DropDownListFor(
                              m => m.SubCategoria.IdSubCategoria,
@@ -43,9 +43,12 @@
                              new { @class = "form-select", id = "ddlSubcategoria" })
 
                 </div>
+                <div class="col-md-2">
+                    <button type="submit" class="btn btn-primary mt-3">Buscar</button>
+                </div>
+
             </div>
 
-            <button type="submit" class="btn btn-primary mt-3">Buscar</button>
         }
 
     </div>
@@ -55,7 +58,7 @@
     {
         <div class="mt-4">
             <div class="table-responsive shadow-sm rounded border p-3 bg-white">
-                <table class="table table-sm table-striped table-bordered table-hover small text-nowrap">
+                <table class="table table-sm table-striped table-bordered table-hover small text-wrap">
                     <thead class="table-dark text-center">
                         <tr>
                             <th scope="col">Acciones</th>
@@ -63,7 +66,7 @@
                             <th>Imagen</th>
                             <th>Nombre</th>
                             <th>Descripcion</th>
-                            <th>Precio</th>
+                            <th>Precio x kilo</th>
                             <th>SubCategoria</th>
                             <th>Categoria</th>
                         </tr>
