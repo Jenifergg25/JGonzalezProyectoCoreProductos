@@ -111,9 +111,42 @@ namespace PL.Controllers
             return View(producto);
         }
         [HttpPost]
-        public IActionResult Form(ML.Producto producto, IFormFile imgName)
+        public IActionResult Form(ML.Producto producto, IFormFile? imgName)
         {
-            if (imgName != null && imgName.Length > 0)
+            if (!ModelState.IsValid)
+            {
+                producto.SubCategoria ??= new ML.SubCategoria(); 
+                producto.SubCategoria.Categoria ??= new ML.Categoria();
+                ML.Result resultCategoria = _categoria.GetAll();
+                if (resultCategoria.Correct)
+                {
+                    producto.SubCategoria.Categoria.Categorias = resultCategoria.Objects;
+                }
+                else
+                {
+                    producto.SubCategoria.Categoria.Categorias = new List<object>();
+                }
+
+                if (producto.SubCategoria.Categoria.IdCategoria > 0)
+                {
+                    ML.Result resultSubCategorias = _subCategoria.GetByIdCategoria(producto.SubCategoria.Categoria.IdCategoria);
+                    if (resultSubCategorias.Correct)
+                    {
+                        producto.SubCategoria.SubCategorias = resultSubCategorias.Objects;
+                    }
+                    else
+                    {
+                        producto.SubCategoria.SubCategorias = new List<object>();
+                    }
+                }
+                else
+                {
+                    producto.SubCategoria.SubCategorias = new List<object>();
+                }
+                return View(producto);
+            }
+
+                if (imgName != null && imgName.Length > 0)
             {
                 using (var memoryStream = new MemoryStream())
                 {

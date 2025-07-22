@@ -387,16 +387,16 @@ namespace PL.Controllers
             return Json(resultColonias);
         }
 
-        //[HttpPost]
-        //public JsonResult UpdateStatus(int IdUsuario, bool Status)
-        //{
-        //    ML.Usuario usuario = new ML.Usuario();
-        //    usuario.IdUsuario = IdUsuario;
-        //    usuario.Status = Status;
+        [HttpPost]
+        public JsonResult UpdateStatus(int IdUsuario, bool Status)
+        {
+            ML.Usuario usuario = new ML.Usuario();
+            usuario.IdUsuario = IdUsuario;
+            usuario.Status = Status;
 
-        //    ML.Result resultStatus = BL.Usuario.UpdateStatus(usuario);
-        //    return Json(new { success = resultStatus.Correct });
-        //}
+            ML.Result resultStatus = _usuario.UpdateStatus(usuario);
+            return Json(new { success = resultStatus.Correct });
+        }
         [NonAction]
         private ML.Result GetAllREST()
         {

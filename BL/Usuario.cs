@@ -1,6 +1,7 @@
 ﻿using DL;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
+using ML;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -295,6 +296,30 @@ namespace BL
                 {
                     result.Correct = false;
                     result.ErrorMessage = "No se pudo eliminar el usuario";
+                }
+            }
+            catch (Exception ex)
+            {
+                result.Correct = false;
+                result.ErrorMessage = ex.Message;
+                result.Ex = ex;
+            }
+            return result;
+        }
+        public  ML.Result UpdateStatus(ML.Usuario usuario)
+        {
+            ML.Result result = new ML.Result();
+            try
+            {
+                var parametros = new[]
+{
+                    new SqlParameter("@IdUsuario",usuario.IdUsuario),
+                    new SqlParameter("@Status",usuario.Status)
+                };
+                var query = _context.Database.ExecuteSqlRaw("UsuarioUpdateStatus @IdUsuario, @Status", parametros);
+                if (query > 0)
+                {
+                    result.Correct = true;
                 }
             }
             catch (Exception ex)

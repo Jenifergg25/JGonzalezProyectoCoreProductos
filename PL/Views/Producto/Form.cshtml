@@ -92,7 +92,9 @@
                                 @class = "form-control",
                                 placeholder = "Ingrese la descripción del producto",
                                 id = "txbDescripcion",
-                                rows = "3"
+                                rows = "3",
+                                onkeypress = "return validarDescripcion(event);",
+                                oninput = "validarDescripcion(event);"
                             })
                     </div>
 
@@ -221,25 +223,76 @@ $('#ddlCategoria').change(function () {
 
 
 
+ function validarDescripcion(event) {
+        var $input = $(event.target);
+        var valor = $input.val();
+        const $errorSpan = $input.parent().parent().find('p');
+        var regexCalle = /^[a-zA-Z0-9ÁÉÍÓÚáéíóúÑñ\s.,-]{10,500}$/;
+
+        if (event.type === "keypress") {
+            var tecla = event.key;
+
+            if ($input.val().length >= 500) {
+                event.preventDefault();
+                $errorSpan.text("La descripcion debe tener máximo 500 caracteres permitidos").addClass('text-danger').removeAttr('hidden');
+                $input.removeClass('is-valid').addClass('is-invalid');
+                return false;
+            }
+        }
+
+        if (event.type === "input" || event.type === "blur") {
+            if (!regexCalle.test(valor)) {
+                $errorSpan.text("La descripción debe tener entre 10 y 500 caracteres").addClass('text-danger').removeAttr('hidden');
+                $input.removeClass('is-valid').addClass('is-invalid');
+            }
+            else if (valor.length < 10) {
+                $errorSpan.text("La descripcion debe tener mínimo 10 caracteres requeridos").addClass('text-danger').removeAttr('hidden');
+                $input.removeClass('is-valid').addClass('is-invalid');
+            }
+            else {
+                $errorSpan.text("").addClass('text-danger').attr('hidden', 'hidden');
+                $input.removeClass('is-invalid').addClass('is-valid');
+            }
+        }
+    }
+
+
     function ValidarPrecio(event) {
         var $input = $(event.target);
         var valor = $input.val();
-        var numeros = /^[0-9]$/;
         const $errorSpan = $input.parent().parent().find('p');
 
+        var regexDecimal = /^\d+(\.\d{1,2})?$/;
+
+        if (event.type === 'keypress') {
+            const tecla = event.key;
+            const valorActual = $input.val();
+
+            if (!/[\d.]/.test(tecla)) {
+                $errorSpan.text("Solo numeros del 1 al 9").addClass('text-danger').removeAttr('hidden');
+                $input.removeClass('is-valid').addClass('is-invalid');
+                event.preventDefault();
+            }
+
+            if (tecla === '.' && valorActual.includes('.')) {
+                event.preventDefault(); 
+            }
+        }
+
         if (event.type === "input" || event.type === "blur") {
-            if (valor = 0) {
-                $errorSpan.text("El precio no debe ir vacio").addClass('text-danger').removeAttr('hidden');
+            if (valor.trim() === "") {
+                $errorSpan.text("El precio no debe ir vacío").addClass('text-danger').removeAttr('hidden');
                 $input.removeClass('is-valid').addClass('is-invalid');
                 return;
             }
-            if (numeros.test(valor)) {
-                $errorSpan.text('').addClass('text-danger').attr('hidden', 'hidden');
+
+            if (regexDecimal.test(valor)) {
+                $errorSpan.text('').attr('hidden', 'hidden');
                 $input.removeClass('is-invalid').addClass('is-valid');
-                return;
+            } else {
+                $errorSpan.text("Ingrese un número válido (ej: 10 o 10.50)").addClass('text-danger').removeAttr('hidden');
+                $input.removeClass('is-valid').addClass('is-invalid');
             }
-            $errorSpan.text('').attr('hidden', 'hidden');
-            $input.removeClass('is-invalid').addClass('is-valid');
         }
     }
 
@@ -256,14 +309,14 @@ $('#ddlCategoria').change(function () {
             var tecla = event.key;
             var regexLetra = /^[a-zA-ZÁÉÍÓÚáéíóúÑñ\s]$/;
             if (!regexLetra.test(tecla)) {
-                $errorSpan.text("Solo se permiten letras").addClass('text-danger').removeAttr('hidden');
+                $errorSpan.text("El nombre del producto solo puede tener letras").addClass('text-danger').removeAttr('hidden');
                 $input.removeClass('is-valid').addClass('is-invalid');
                 event.preventDefault();
                 return false;
             }
 
             if (valor.length >= 100) {
-                $errorSpan.text("Máximo 100 caracteres").addClass('text-danger').removeAttr('hidden');
+                $errorSpan.text("El nombre debe tener máximo 100 caracteres").addClass('text-danger').removeAttr('hidden');
                 $input.removeClass('is-valid').addClass('is-invalid');
                 event.preventDefault();
                 return false;
@@ -273,13 +326,13 @@ $('#ddlCategoria').change(function () {
         if (event.type === "input" || event.type === "blur") {
             if (valor.length > 100) {
                 $input.val(valor.substring(0, 100));
-                $errorSpan.text("Máximo 100 caracteres").addClass('text-danger').removeAttr('hidden');
+                $errorSpan.text("El nombre debe tener máximo 100 caracteres").addClass('text-danger').removeAttr('hidden');
                 $input.removeClass('is-valid').addClass('is-invalid');
                 return;
             }
 
             if (valor.length < 4) {
-                $errorSpan.text("Mínimo 4 caracteres").addClass('text-danger').removeAttr('hidden');
+                $errorSpan.text("El nombre debe tener mínimo 4 caracteres").addClass('text-danger').removeAttr('hidden');
                 $input.removeClass('is-valid').addClass('is-invalid');
                 return;
             }
