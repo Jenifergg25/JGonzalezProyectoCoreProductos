@@ -1,8 +1,18 @@
-﻿@model ML.Producto
-
+﻿
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+<div class="row px-4">
+    <div class="col-md-6">
+        <h2>Catálogo de Productos</h2>
 
-<h2>Catálogo de Productos</h2>
+    </div>
+
+    <div class="col-md-6 text-end">
+    <button id="btnAgregarProducto" class="btn btn-success mb-4">
+        <i class="bi bi-plus-lg"></i> Agregar Producto
+    </button>
+    </div>
+</div>
+
 
 <div class="container">
 
@@ -10,7 +20,7 @@
     <div class="row">
         <div class="col-md-6">
             <label for="ddlCategoria">Categoría</label>
-            <select id="ddlCategoria" class="form-control">
+                <select id="ddlCategoria" class="form-control" onchange="cargarSubCategorias(this.value, '#ddlSubcategoria')">
                 <option value="">Seleccione una categoría</option>
             </select>
         </div>
@@ -21,14 +31,108 @@
                 <option value="">Seleccione una subcategoría</option>
             </select>
         </div>
+
+        </div>
     </div>
-</div>
 
 
 <div id="contenedorProductos" class="row">
     </div>
 </div>
 
+<div class="modal fade" id="modalProducto" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header justify-content-center border-0">
+                <h3 class="modal-title text-center w-100">Nuevo Producto</h3>
+            </div>
+
+            <div class="modal-body">
+                <form id="formProducto" enctype="multipart/form-data">
+                    <div class="row mb-3">
+                        <div class="d-flex justify-content-center">
+                            <img id="previewImg" src="/Imagenes/iconoproducto.png" style="width: 150px; display:none;" />
+                        </div>
+                        <div class="d-flex justify-content-center mt-2">
+                            <input type="file" class="form-control rounded w-50" name="Imagen" id="imagenProducto" accept="image/*" onchange="CargarImagen(event)" />
+                        </div>
+                    </div>
+
+                    <div class="row m-2">
+                        <div class="col">
+                            <label for="nombreProducto" class="form-label">Nombre</label>
+                            <div class="d-flex input-group">
+                                <div class="input-group-text bg-dark text-white">
+                                    <i class="bi bi-box p-1 fs-5"></i>
+                                </div>
+                                <input type="text" class="form-control" id="nombreProducto" name="Nombre" placeholder="Ingrese el nombre del producto" required />
+                            </div>
+                        </div>
+
+                        <div class="col">
+                            <label for="precioProducto" class="form-label">Precio</label>
+                            <div class="d-flex input-group"> 
+                                <div class="input-group-text bg-dark text-white">
+                                    <i class="bi bi-currency-dollar p-1 fs-5"></i>
+                                </div>
+                                <input type="number" step="0.01" class="form-control" id="precioProducto" name="Precio" placeholder="Ingrese el precio del producto" required />
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row m-2">
+                        <div class="col">
+                            <label for="descripcionProducto" class="form-label">Descripción</label>
+                            <div class="d-flex input-group mb-3">
+                                <div class="input-group-text bg-dark text-white">
+                                    <i class="bi bi-card-text p-1 fs-5"></i>
+                                </div>
+                                <textarea class="form-control" id="descripcionProducto" name="Descripcion" placeholder="Ingrese la descripción del producto" rows="3"></textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                    <h5 class="text-center m-4">CATEGORÍA Y SUBCATEGORÍA</h5>
+
+                    <div class="row m-2">
+                        <div class="col">
+                            <label for="ddlCategoriaModal" class="form-label">Categoría</label>
+                            <div class="d-flex input-group">
+                                <div class="input-group-text bg-dark text-white">
+                                    <i class="bi bi-collection p-1 fs-5"></i>
+                                </div>
+                                <select class="form-select" id="ddlCategoriaModal" name="ddlCategoriaModal" required onchange="cargarSubCategorias(this.value, '#ddlSubCategoriaModal')">
+                                    <option value="">Selecciona una categoría</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="col">
+                            <label for="ddlSubCategoriaModal" class="form-label">Subcategoría</label>
+                            <div class="d-flex input-group">
+                                <div class="input-group-text bg-dark text-white">
+                                    <i class="bi bi-tag p-1 fs-5"></i>
+                                </div>
+                                <select class="form-select" id="ddlSubCategoriaModal" name="ddlSubCategoriaModal" required disabled>
+                                    <option value="">Selecciona una subcategoría</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                </form>
+            </div>
+
+            <div class="modal-footer justify-content-center border-0">
+                <button type="button" class="btn btn-secondary me-2" data-bs-dismiss="modal">Cancelar</button>
+                <button type="submit" form="formProducto" class="btn btn-dark">
+                    <i class="bi bi-save me-2"></i> Guardar producto
+                </button>
+            </div>
+
+        </div>
+    </div>
+</div>
 
 
 
@@ -37,7 +141,7 @@
 
 <script>
     $(document).ready(function () {
-        cargarCategorias();
+        cargarCategorias('#ddlCategoria');
         mostrarMensajeInicial();
 
         $('#ddlCategoria').change(function () {
@@ -56,6 +160,31 @@
         $('#ddlSubcategoria').change(function () {
             cargarProductos();
         });
+
+        $('#btnAgregarProducto').click(function () {
+            $('#formProducto')[0].reset();
+            $('#modalProducto .modal-title').text('Nuevo Producto');
+            const imagenDefault = '/Imagenes/iconoproducto.png';
+
+            $('#previewImg').attr('src', imagenDefault).show();
+
+            $('#imagenProducto').val('');
+            cargarCategorias('#ddlCategoriaModal');
+            var modal = new bootstrap.Modal(document.getElementById('modalProducto'));
+            modal.show();
+            $('#ddlCategoriaModal').change(function () {
+                var categoriaId = $(this).val();
+                if (categoriaId) {
+                    $('#ddlSubCategoriaModal').prop('disabled', false);
+                    cargarSubCategoriasModal(idCategoria);
+                } else {
+                    $('#ddlSubCategoriaModal')
+                        .empty()
+                        .append('<option value="">Seleccione una subcategoría</option>')
+                        .prop('disabled', true);
+                }
+            });
+        });
     });
 
     function mostrarMensajeInicial() {
@@ -71,12 +200,12 @@
         `);
     }
 
-    function cargarCategorias() {
+    function cargarCategorias(selectorCategoria) {
         $.ajax({
             url: '/Producto/GetCategorias',
             method: 'GET',
             success: function (data) {
-                var ddl = $('#ddlCategoria');
+                var ddl = $(selectorCategoria);
                 ddl.empty();
                 ddl.append('<option value="">Seleccione una categoría</option>');
                 $.each(data, function (i, categoria) {
@@ -86,13 +215,13 @@
         });
     }
 
-    function cargarSubCategorias(categoriaId) {
+    function cargarSubCategorias(categoriaId, selectorSubcategoria) {
         $.ajax({
             url: '/Producto/GetSubcategorias',
             method: 'GET',
             data: { idCategoria: categoriaId },
             success: function (data) {
-                var ddl = $('#ddlSubcategoria');
+                var ddl = $(selectorSubcategoria);
                 ddl.empty();
                 ddl.append('<option value="">Seleccione una subcategoría</option>');
                 $.each(data, function (i, subcategoria) {
@@ -148,7 +277,7 @@
                                         $${producto.precio.toFixed(2)}
                                     </p>
                                     <div class="d-flex justify-content-center gap-2 mt-auto">
-                                        <button class="btn btn-warning btn-sm px-3" onclick="editarProducto(${producto.idProducto})">
+                                            <button class="btn btn-warning btn-sm px-3" onclick="obtenerProductoPorId(${producto.idProducto})">
                                             <i class="bi bi-pencil-square"></i> Editar
                                         </button>
                                         <button class="btn btn-danger btn-sm px-3" onclick="eliminarProducto(${producto.idProducto})">
@@ -162,6 +291,48 @@
 
                 });
 
+            }
+        });
+    }
+
+
+
+
+    function obtenerProductoPorId(idProducto) {
+        $('#modalProducto .modal-title').text('Modificar Producto');
+        $.ajax({
+            url: '/Producto/GetById',
+            method: 'GET',
+            data: { idProducto: idProducto },
+            success: function (producto) {
+                if (producto) {
+                    $('#nombreProducto').val(producto.nombre);
+                    $('#precioProducto').val(producto.precio);
+                    $('#descripcionProducto').val(producto.descripcion);
+
+                    $('#ddlCategoriaModal').val(producto.subCategoria.categoria.idCategoria);
+                    cargarSubCategorias(producto.subCategoria.categoria.idCategoria, '#ddlSubCategoriaModal');
+
+                    setTimeout(function () {
+                        $('#ddlSubCategoriaModal').val(producto.subCategoria.idSubCategoria);
+                        $('#ddlSubCategoriaModal').prop('disabled', false);
+                    }, 300);
+
+                    if (producto.imagenBase64) {
+                        $('#previewImg').attr('src', producto.imagenBase64).show();
+                    } else {
+                        $('#previewImg').attr('src', '').hide();
+                    }
+
+                    var modal = new bootstrap.Modal(document.getElementById('modalProducto'));
+                    modal.show();
+                } else {
+                    alert('Producto no encontrado.');
+                }
+            },
+            error: function (xhr, status, error) {
+                console.error('Error al obtener producto:', error);
+                alert('Ocurrió un error al obtener el producto.');
             }
         });
     }

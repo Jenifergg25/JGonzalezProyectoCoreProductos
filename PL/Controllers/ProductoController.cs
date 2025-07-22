@@ -295,6 +295,42 @@ namespace PL.Controllers
 
                 return Json(new List<object>());
         }
+        [HttpGet]
+        public JsonResult GetById(int idProducto)
+        {
+            ML.Result result = _producto.GetById(idProducto); 
+
+            if (result.Correct && result.Object != null)
+            {
+                ML.Producto p = (ML.Producto)result.Object;
+
+                var producto = new
+                {
+                    IdProducto = p.IdProducto,
+                    Nombre = p.Nombre,
+                    Precio = p.Precio,
+                    Descripcion = p.Descripcion,
+                    SubCategoria = new
+                    {
+                        IdSubCategoria = p.SubCategoria?.IdSubCategoria,
+                        Nombre = p.SubCategoria?.Nombre,
+                        Categoria = new
+                        {
+                            IdCategoria = p.SubCategoria?.Categoria?.IdCategoria,
+                            Nombre = p.SubCategoria?.Categoria?.Nombre
+                        }
+                    },
+                    ImagenBase64 = p.Imagen != null && p.Imagen.Length > 0 ? $"data:image/png;base64,{Convert.ToBase64String(p.Imagen)}" : null
+                };
+
+                return Json(producto);
+            }
+            else
+            {
+                return Json(null);
+            }
+        }
+
 
     }
 }
