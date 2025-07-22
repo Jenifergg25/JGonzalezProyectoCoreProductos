@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using BL;
+using Microsoft.AspNetCore.Mvc;
 using ML;
 
 namespace PL.Controllers
@@ -221,12 +222,78 @@ namespace PL.Controllers
                 return RedirectToAction("GetAll");
             }
         }
+        [HttpGet]
+        public JsonResult GetCategorias()
+        {
+            ML.Result result = _categoria.GetAll();
+
+            if (result.Correct && result.Objects != null)
+            {
+                var categorias = result.Objects.Cast<ML.Categoria>().Select(c => new {
+                    idCategoria = c.IdCategoria,
+                    nombre = c.Nombre
+                });
+
+                return Json(categorias);
+            }
+
+            return Json(new List<object>());
+        }
 
         [HttpGet]
         public JsonResult GetSubcategorias(int idCategoria)
         {
             ML.Result result = _subCategoria.GetByIdCategoria(idCategoria);
-            return Json(result.Objects);
+
+            if (result.Correct && result.Objects != null)
+            {
+                var subcategorias = result.Objects.Cast<ML.SubCategoria>().Select(s => new {
+                    idSubCategoria = s.IdSubCategoria,
+                    nombre = s.Nombre
+                });
+
+                return Json(subcategorias);
+            }
+
+            return Json(new List<object>());
+        }
+        [HttpGet]
+        public JsonResult GetAllJson(int? Idcategoria, int? IdsubCategoria)
+        {
+            ML.Producto productoFiltro = new ML.Producto();
+            if (Idcategoria.HasValue && Idcategoria.Value > 0)
+            {
+                productoFiltro.SubCategoria = new ML.SubCategoria();
+                productoFiltro.SubCategoria.Categoria = new ML.Categoria();
+                productoFiltro.SubCategoria.Categoria.IdCategoria = Idcategoria.Value;
+            }
+            if (IdsubCategoria.HasValue && IdsubCategoria.Value > 0)
+            {
+                if (productoFiltro.SubCategoria == null)
+                {
+                    productoFiltro.SubCategoria = new ML.SubCategoria();
+                }
+
+                productoFiltro.SubCategoria.IdSubCategoria = IdsubCategoria.Value;
+            }
+            ML.Result result = _producto.GetAll(productoFiltro);
+            if (result.Correct && result.Objects != null)
+            {
+                var productos = result.Objects.Cast<ML.Producto>().Select(p => new { 
+                    IdProducto = p.IdProducto,
+                    Nombre = p.Nombre,
+                    Precio = p.Precio,
+                    Descripcion = p.Descripcion,
+                    SubCategoria = p.SubCategoria?.Nombre,
+                    Categoria = p.SubCategoria?.Categoria?.Nombre,
+                    ImagenBase64 = p.Imagen != null && p.Imagen.Length > 0 ? $"data:image/png;base64,{Convert.ToBase64String(p.Imagen)}" : null
+                });
+
+                return Json(productos);
+            }
+
+
+                return Json(new List<object>());
         }
 
     }

@@ -25,8 +25,8 @@ namespace BL
             {
                 var parametros = new[]
                 {
-                    new SqlParameter("@IdSubcategoria", productoParametro.SubCategoria.IdSubCategoria),
-                    new SqlParameter("@IdCategoria", productoParametro.SubCategoria.Categoria.IdCategoria)
+                    new SqlParameter("@IdSubcategoria", productoParametro.SubCategoria?.IdSubCategoria),
+                    new SqlParameter("@IdCategoria", productoParametro.SubCategoria?.Categoria?.IdCategoria)
                 };
                 var query = _context.ProductoViews.FromSqlRaw("ProductoGetAll @IdSubcategoria, @IdCategoria", parametros).ToList();
                 if (query.Count > 0)
