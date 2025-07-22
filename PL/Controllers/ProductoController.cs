@@ -19,6 +19,11 @@ namespace PL.Controllers
         {
             return View();
         }
+        [HttpGet] 
+        public IActionResult GetAllAjax()
+        {
+            return View();
+        }
         [HttpGet]
         public IActionResult GetAll()
         {
