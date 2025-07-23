@@ -330,7 +330,46 @@ namespace PL.Controllers
                 return Json(null);
             }
         }
+        [HttpPost]
+        public JsonResult AddOrUpdate(ML.Producto producto, IFormFile? Imagen)
+        {
+            if (Imagen != null)
+            {
+                using (var ms = new MemoryStream())
+                {
+                    Imagen.CopyTo(ms); 
+                    producto.Imagen = ms.ToArray();
+                }
+            }
+            ML.Result result;
 
+            if (producto.IdProducto == 0)
+            {
+                // Add
+                result = _producto.Add(producto);
+            }
+            else
+            {
+                // Update
+                result = _producto.Update(producto);
+            }
+
+            if (result.Correct)
+            {
+                return Json(new { success = true, message = "Producto guardado correctamente." });
+            }
+            else
+            {
+                return Json(new { success = false, message = result.ErrorMessage });
+            }
+        }
+
+        [HttpPost]
+        public JsonResult DeleteJson(int idProducto)
+        {
+            ML.Result result = _producto.Delete(idProducto);
+            return Json(new { success = result.Correct, message = result.Correct ? "Producto eliminado correctamente." : result.ErrorMessage });
+        }
 
     }
 }

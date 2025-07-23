@@ -20,14 +20,14 @@
     <div class="row">
         <div class="col-md-6">
             <label for="ddlCategoria">Categoría</label>
-                <select id="ddlCategoria" class="form-control" onchange="cargarSubCategorias(this.value, '#ddlSubcategoria')">
+                <select id="ddlCategoria" class="form-select" onchange="cargarSubCategorias(this.value, '#ddlSubcategoria')">
                 <option value="">Seleccione una categoría</option>
             </select>
         </div>
 
         <div class="col-md-6">
             <label for="ddlSubcategoria">Subcategoría</label>
-            <select id="ddlSubcategoria" class="form-control" disabled>
+                <select id="ddlSubcategoria" class="form-select" disabled>
                 <option value="">Seleccione una subcategoría</option>
             </select>
         </div>
@@ -48,13 +48,14 @@
             </div>
 
             <div class="modal-body">
-                <form id="formProducto" enctype="multipart/form-data">
+                <form id="formProducto" enctype="multipart/form-data" onsubmit="return validarCamposObligatorios();">
+                    <input type="hidden" name="IdProducto" id="IdProducto" value="0" />
                     <div class="row mb-3">
                         <div class="d-flex justify-content-center">
-                            <img id="previewImg" src="/Imagenes/iconoproducto.png" style="width: 150px; display:none;" />
+                            <img id="previewImg" src="/Imagenes/iconoproducto.png" style="width: 200px; display:none;" />
                         </div>
                         <div class="d-flex justify-content-center mt-2">
-                            <input type="file" class="form-control rounded w-50" name="Imagen" id="imagenProducto" accept="image/*" onchange="CargarImagen(event)" />
+                            <input type="file" class="form-control rounded w-50" name="Imagen" id="imagenProducto" accept="image/*" onchange="CargarImagen(this)" />
                         </div>
                     </div>
 
@@ -65,8 +66,9 @@
                                 <div class="input-group-text bg-dark text-white">
                                     <i class="bi bi-box p-1 fs-5"></i>
                                 </div>
-                                <input type="text" class="form-control" id="nombreProducto" name="Nombre" placeholder="Ingrese el nombre del producto" required />
+                                <input type="text" class="form-control" id="nombreProducto" name="Nombre" placeholder="Ingrese el nombre del producto" data-obligatorio="true" onkeypress="return ValidarNombreProducto(event);" oninput="ValidarNombreProducto(event);" onblur="ValidarNombreProducto(event)" />
                             </div>
+                                <p hidden="hidden"></p>
                         </div>
 
                         <div class="col">
@@ -75,8 +77,9 @@
                                 <div class="input-group-text bg-dark text-white">
                                     <i class="bi bi-currency-dollar p-1 fs-5"></i>
                                 </div>
-                                <input type="number" step="0.01" class="form-control" id="precioProducto" name="Precio" placeholder="Ingrese el precio del producto" required />
+                                <input type="number" step="0.01" class="form-control" id="precioProducto" name="Precio" placeholder="Ingrese el precio del producto" data-obligatorio="true" onkeypress="return ValidarPrecio(event);" oninput="ValidarPrecio(event);" onblur="ValidarPrecio(event)" />
                             </div>
+                                <p hidden="hidden"></p>
                         </div>
                     </div>
 
@@ -87,8 +90,9 @@
                                 <div class="input-group-text bg-dark text-white">
                                     <i class="bi bi-card-text p-1 fs-5"></i>
                                 </div>
-                                <textarea class="form-control" id="descripcionProducto" name="Descripcion" placeholder="Ingrese la descripción del producto" rows="3"></textarea>
+                                <textarea class="form-control" id="descripcionProducto" name="Descripcion" placeholder="Ingrese la descripción del producto" rows="3" onkeypress="return validarDescripcion(event);" oninput="validarDescripcion(event);"></textarea>
                             </div>
+                                <p hidden="hidden"></p>
                         </div>
                     </div>
 
@@ -101,10 +105,11 @@
                                 <div class="input-group-text bg-dark text-white">
                                     <i class="bi bi-collection p-1 fs-5"></i>
                                 </div>
-                                <select class="form-select" id="ddlCategoriaModal" name="ddlCategoriaModal" required onchange="cargarSubCategorias(this.value, '#ddlSubCategoriaModal')">
+                                <select class="form-select" id="ddlCategoriaModal" name="SubCategoria.Categoria.IdCategoria" data-obligatorio="true" onchange="cargarSubCategorias(this.value, '#ddlSubCategoriaModal'),  validarDropDownList(this);">
                                     <option value="">Selecciona una categoría</option>
                                 </select>
                             </div>
+                                <p hidden="hidden"></p>
                         </div>
 
                         <div class="col">
@@ -113,10 +118,11 @@
                                 <div class="input-group-text bg-dark text-white">
                                     <i class="bi bi-tag p-1 fs-5"></i>
                                 </div>
-                                <select class="form-select" id="ddlSubCategoriaModal" name="ddlSubCategoriaModal" required disabled>
+                                <select class="form-select" id="ddlSubCategoriaModal" name="SubCategoria.IdSubCategoria" data-obligatorio="true" disabled onchange="validarDropDownList(this);">
                                     <option value="">Selecciona una subcategoría</option>
                                 </select>
                             </div>
+                                <p hidden="hidden"></p>
                         </div>
                     </div>
 
@@ -126,7 +132,7 @@
             <div class="modal-footer justify-content-center border-0">
                 <button type="button" class="btn btn-secondary me-2" data-bs-dismiss="modal">Cancelar</button>
                 <button type="submit" form="formProducto" class="btn btn-dark">
-                    <i class="bi bi-save me-2"></i> Guardar producto
+                    <i class="bi bi-save me-2"></i> Guardar
                 </button>
             </div>
 
@@ -145,47 +151,162 @@
         mostrarMensajeInicial();
 
         $('#ddlCategoria').change(function () {
-            var categoriaId = $(this).val();
-
+            let categoriaId = $(this).val();
             if (categoriaId) {
-                cargarSubCategorias(categoriaId);
+                cargarSubCategorias(categoriaId, '#ddlSubcategoria');
                 $('#ddlSubcategoria').prop('disabled', false);
             } else {
-                $('#ddlSubcategoria').empty().append('<option value="">Seleccione una subcategoría</option>').prop('disabled', true);
+                resetearDropdown('#ddlSubcategoria');
+            }
+            cargarProductos();
+        });
+
+        $('#ddlSubcategoria').change(cargarProductos);
+
+        $('#btnAgregarProducto').click(abrirModalNuevoProducto);
+
+        $('#ddlCategoriaModal').change(function () {
+            const idCategoria = $(this).val();
+            if (idCategoria) {
+                $('#ddlSubCategoriaModal').prop('disabled', false);
+                cargarSubCategorias(idCategoria, '#ddlSubCategoriaModal');
+            } else {
+                resetearDropdown('#ddlSubCategoriaModal');
+            }
+        });
+
+
+        function validarCamposObligatorios() {
+            let esValido = true;
+
+            $('[data-obligatorio="true"]').each(function () {
+                const $input = $(this);
+                const valor = $input.val().trim();
+                const $errorSpan = $input.parent().parent().find('p');
+
+                if (valor === '') {
+                    $errorSpan.text('Este campo es obligatorio').addClass('text-danger').removeAttr('hidden');
+                    $input.removeClass('is-valid').addClass('is-invalid');
+                    esValido = false;
+                }
+                else {
+                    $errorSpan.text('').addClass('text-danger').attr('hidden', 'hidden');
+                    $input.removeClass('is-invalid').addClass('is-valid');
+                }
+                
+            });
+
+            return esValido;
+        }
+
+
+
+
+        $('#formProducto').submit(function (e) {
+            e.preventDefault();
+
+            if(!validarCamposObligatorios()){
+                return;
             }
 
-            cargarProductos();
-        });
+            let formData = new FormData(this);
 
-        $('#ddlSubcategoria').change(function () {
-            cargarProductos();
-        });
-
-        $('#btnAgregarProducto').click(function () {
-            $('#formProducto')[0].reset();
-            $('#modalProducto .modal-title').text('Nuevo Producto');
-            const imagenDefault = '/Imagenes/iconoproducto.png';
-
-            $('#previewImg').attr('src', imagenDefault).show();
-
-            $('#imagenProducto').val('');
-            cargarCategorias('#ddlCategoriaModal');
-            var modal = new bootstrap.Modal(document.getElementById('modalProducto'));
-            modal.show();
-            $('#ddlCategoriaModal').change(function () {
-                var categoriaId = $(this).val();
-                if (categoriaId) {
-                    $('#ddlSubCategoriaModal').prop('disabled', false);
-                    cargarSubCategoriasModal(idCategoria);
-                } else {
-                    $('#ddlSubCategoriaModal')
-                        .empty()
-                        .append('<option value="">Seleccione una subcategoría</option>')
-                        .prop('disabled', true);
+            $.ajax({
+                url: '/Producto/AddOrUpdate',
+                type: 'POST',
+                data: formData,
+                contentType: false,
+                processData: false,
+                success: function (response) {
+                    if (response.success) {
+                        Swal.fire('Aviso', response.message, 'success');
+                        $('#modalProducto').modal('hide');
+                        cargarProductos();
+                        limpiarFormulario();
+                    } else {
+                        Swal.fire('Error', response.message, 'error');
+                    }
+                },
+                error: function () {
+                    Swal.fire('Error', 'Error inesperado al guardar el producto.', 'error');
                 }
             });
         });
     });
+
+    function limpiarFormulario() {
+        $('#formProducto')[0].reset();
+        $('#IdProducto').val('');
+        $('#previewImg').attr('src', '/Imagenes/iconoproducto.png').show();
+        $('#formProducto').find('p').text('').addClass('text-danger').attr('hidden', 'hidden');
+        $('#formProducto').find('input, select, textarea').removeClass('is-invalid is-valid');
+        resetearDropdown('#ddlSubCategoriaModal');
+    }
+
+    function CargarImagen(input) {
+        var file = input.files[0];
+
+        if (validar(file?.name)) {
+            if (input.files && file) {
+                var reader = new FileReader();
+                reader.onload = function (e) {
+                    $('#previewImg').attr('src', e.target.result).show();
+                };
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+        else{
+            input.value = "";
+            $('#previewImg').attr('src', '/Imagenes/iconoproducto.png').show();
+            return;
+        }
+    }
+
+
+    function validar(imgName) {
+        let extensions = ["png", "jpg", "jpeg"];
+        if (!imgName) {
+            Swal.fire({
+                title: 'Aviso',
+                text: 'No se subió archivo.',
+                icon: 'warning',
+                confirmButtonColor: '#3085d6',
+                confirmButtonText: 'OK'
+            });
+            return false;
+        }
+        let imgExtension = imgName.split('.').pop().toLowerCase();
+        if (!extensions.includes(imgExtension)) {
+            Swal.fire({
+                title: 'Archivo invalido',
+                text: 'No es un formato de imagen válido (png, jpg, jpeg).',
+                icon: 'error',
+                confirmButtonColor: '#d33',
+                confirmButtonText: 'OK'
+            });
+            return false;
+        }
+        return true;
+    }
+
+    function abrirModalNuevoProducto() {
+        cargarCategorias('#ddlCategoriaModal').done(function () {
+            $('#modalProducto .modal-title').text('Nuevo Producto');
+            $('#imagenProducto').val('');
+            resetearDropdown('#ddlSubCategoriaModal');
+            limpiarFormulario();
+
+            new bootstrap.Modal(document.getElementById('modalProducto')).show();
+        });
+    }
+
+    function resetearDropdown(selector) {
+        $(selector)
+            .empty()
+            .append('<option value="">Seleccione una subcategoría</option>')
+            .prop('disabled', true);
+    }
+
 
     function mostrarMensajeInicial() {
         const contenedor = $("#contenedorProductos");
@@ -201,7 +322,7 @@
     }
 
     function cargarCategorias(selectorCategoria) {
-        $.ajax({
+        return $.ajax({
             url: '/Producto/GetCategorias',
             method: 'GET',
             success: function (data) {
@@ -216,7 +337,7 @@
     }
 
     function cargarSubCategorias(categoriaId, selectorSubcategoria) {
-        $.ajax({
+        return $.ajax({
             url: '/Producto/GetSubcategorias',
             method: 'GET',
             data: { idCategoria: categoriaId },
@@ -262,7 +383,7 @@
                     var imgSrc = producto.imagenBase64 ? producto.imagenBase64 : '/Imagenes/iconoproducto.png';
                     contenedor.append(`
                         <div class="col-lg-4 col-md-5 d-flex justify-content-center mb-4">
-                            <div class="card shadow-lg border-0 rounded-4" style="width: 100%; max-width: 350px;">
+                            <div class="card shadow-lg border-0 rounded-4" style="width: 100%; max-width: 400px;">
                                 <img src="${imgSrc}" class="card-img-top rounded-top-4" alt="${producto.nombre}"
                                     style="height: 200px; object-fit: cover;"
                                     onerror="this.onerror=null;this.src='/images/icon-placeholder.png';" />
@@ -274,13 +395,13 @@
                                     </p>
                                     <p class="card-text"><strong>Subcategoría:</strong> ${producto.subCategoria || 'N/A'}</p>
                                     <p class="card-text fs-5 fw-semibold text-success mb-3">
-                                        $${producto.precio.toFixed(2)}
+                                        $${producto.precio.toFixed(2)} el kilo
                                     </p>
                                     <div class="d-flex justify-content-center gap-2 mt-auto">
                                             <button class="btn btn-warning btn-sm px-3" onclick="obtenerProductoPorId(${producto.idProducto})">
                                             <i class="bi bi-pencil-square"></i> Editar
                                         </button>
-                                        <button class="btn btn-danger btn-sm px-3" onclick="eliminarProducto(${producto.idProducto})">
+                                            <button class="btn btn-danger btn-sm px-3" onclick="eliminarProducto(${producto.idProducto})">
                                             <i class="bi bi-trash"></i> Eliminar
                                         </button>
                                     </div>
@@ -306,22 +427,23 @@
             data: { idProducto: idProducto },
             success: function (producto) {
                 if (producto) {
+                    $('#IdProducto').val(producto.idProducto);
                     $('#nombreProducto').val(producto.nombre);
                     $('#precioProducto').val(producto.precio);
                     $('#descripcionProducto').val(producto.descripcion);
 
-                    $('#ddlCategoriaModal').val(producto.subCategoria.categoria.idCategoria);
-                    cargarSubCategorias(producto.subCategoria.categoria.idCategoria, '#ddlSubCategoriaModal');
-
-                    setTimeout(function () {
-                        $('#ddlSubCategoriaModal').val(producto.subCategoria.idSubCategoria);
-                        $('#ddlSubCategoriaModal').prop('disabled', false);
-                    }, 300);
+                    cargarCategorias('#ddlCategoriaModal').done(function () {
+                        $('#ddlCategoriaModal').val(producto.subCategoria.categoria.idCategoria);
+                        cargarSubCategorias(producto.subCategoria.categoria.idCategoria, '#ddlSubCategoriaModal').done(function () {
+                            $('#ddlSubCategoriaModal').val(producto.subCategoria.idSubCategoria);
+                            $('#ddlSubCategoriaModal').prop('disabled', false);
+                        });
+                    });
 
                     if (producto.imagenBase64) {
                         $('#previewImg').attr('src', producto.imagenBase64).show();
                     } else {
-                        $('#previewImg').attr('src', '').hide();
+                        $('#previewImg').attr('src', '/Imagenes/iconoproducto.png');
                     }
 
                     var modal = new bootstrap.Modal(document.getElementById('modalProducto'));
@@ -338,4 +460,169 @@
     }
 
 
+
+
+    function eliminarProducto(idProducto) {
+        Swal.fire({
+            title: 'Advertencia',
+            text: "¿Deseas eliminar este producto?",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Aceptar',
+            cancelButtonText: 'Cancelar'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $.ajax({
+                    type: "POST",
+                    url: "/Producto/DeleteJson",
+                    data: { idProducto: idProducto },
+                    success: function (response) {
+                        if (response.success) {
+                            Swal.fire('Aviso', 'El producto fue eliminado', 'success');
+                            cargarProductos(); 
+                        } else {
+                            Swal.fire('Error', response.message, 'error');
+                        }
+                    },
+                    error: function () {
+                        Swal.fire('Error', 'No se pudo eliminar el producto.', 'error');
+                    }
+                });
+            }
+        });
+    }
+
+
+    function ValidarNombreProducto(event) {
+        var $input = $(event.target);
+        var valor = $input.val();
+        var letras = /^[a-zA-ZÁÉÍÓÚáéíóúÑñ\s]*$/;
+        const $errorSpan = $input.parent().parent().find('p');
+
+        if (event.type === "keypress") {
+            var tecla = event.key;
+            var regexLetra = /^[a-zA-ZÁÉÍÓÚáéíóúÑñ\s]$/;
+            if (!regexLetra.test(tecla)) {
+                $errorSpan.text("El nombre del producto solo puede tener letras").addClass('text-danger').removeAttr('hidden');
+                $input.removeClass('is-valid').addClass('is-invalid');
+                event.preventDefault();
+                return false;
+            }
+
+            if (valor.length >= 100) {
+                $errorSpan.text("El nombre debe tener máximo 100 caracteres").addClass('text-danger').removeAttr('hidden');
+                $input.removeClass('is-valid').addClass('is-invalid');
+                event.preventDefault();
+                return false;
+            }
+        }
+
+        if (event.type === "input" || event.type === "blur") {
+            if (valor.length > 100) {
+                $input.val(valor.substring(0, 100));
+                $errorSpan.text("El nombre debe tener máximo 100 caracteres").addClass('text-danger').removeAttr('hidden');
+                $input.removeClass('is-valid').addClass('is-invalid');
+                return;
+            }
+
+            if (valor.length < 4) {
+                $errorSpan.text("El nombre debe tener mínimo 4 caracteres").addClass('text-danger').removeAttr('hidden');
+                $input.removeClass('is-valid').addClass('is-invalid');
+                return;
+            }
+
+            if (letras.test(valor)) {
+                $errorSpan.text('').addClass('text-danger').attr('hidden', 'hidden');
+                $input.removeClass('is-invalid').addClass('is-valid');
+                return;
+            }
+            $errorSpan.text('').attr('hidden', 'hidden');
+            $input.removeClass('is-invalid').addClass('is-valid');
+        }
+    }
+
+    function ValidarPrecio(event) {
+        var $input = $(event.target);
+        var valor = $input.val();
+        const $errorSpan = $input.parent().parent().find('p');
+
+        var regexDecimal = /^\d+(\.\d{1,2})?$/;
+
+        if (event.type === 'keypress') {
+            const tecla = event.key;
+            const valorActual = $input.val();
+
+            if (!/[\d.]/.test(tecla)) {
+                $errorSpan.text("Solo numeros y decimales ej. 12.50, 8, 25.50").addClass('text-danger').removeAttr('hidden');
+                $input.removeClass('is-valid').addClass('is-invalid');
+                event.preventDefault();
+            }
+
+            if (tecla === '.' && valorActual.includes('.')) {
+                event.preventDefault();
+            }
+        }
+
+        if (event.type === "input" || event.type === "blur") {
+            if (valor.trim() === "") {
+                $errorSpan.text("El campo precio es obligatorio").addClass('text-danger').removeAttr('hidden');
+                $input.removeClass('is-valid').addClass('is-invalid');
+                return;
+            }
+
+            if (regexDecimal.test(valor)) {
+                $errorSpan.text('').attr('hidden', 'hidden');
+                $input.removeClass('is-invalid').addClass('is-valid');
+            } else {
+                $errorSpan.text("Ingrese un número válido (ej: 10 o 10.50)").addClass('text-danger').removeAttr('hidden');
+                $input.removeClass('is-valid').addClass('is-invalid');
+            }
+        }
+    }
+
+    function validarDescripcion(event) {
+        var $input = $(event.target);
+        var valor = $input.val();
+        const $errorSpan = $input.parent().parent().find('p');
+        var regexCalle = /^[a-zA-Z0-9ÁÉÍÓÚáéíóúÑñ\s.,-]{10,500}$/;
+
+        if (event.type === "keypress") {
+            var tecla = event.key;
+
+            if ($input.val().length >= 500) {
+                event.preventDefault();
+                $errorSpan.text("La descripcion debe tener máximo 500 caracteres permitidos").addClass('text-danger').removeAttr('hidden');
+                $input.removeClass('is-valid').addClass('is-invalid');
+                return false;
+            }
+        }
+
+        if (event.type === "input" || event.type === "blur") {
+            if (!regexCalle.test(valor)) {
+                $errorSpan.text("La descripción debe tener entre 10 y 500 caracteres").addClass('text-danger').removeAttr('hidden');
+                $input.removeClass('is-valid').addClass('is-invalid');
+            }
+            else if (valor.length < 10) {
+                $errorSpan.text("La descripcion debe tener mínimo 10 caracteres requeridos").addClass('text-danger').removeAttr('hidden');
+                $input.removeClass('is-valid').addClass('is-invalid');
+            }
+            else {
+                $errorSpan.text("").addClass('text-danger').attr('hidden', 'hidden');
+                $input.removeClass('is-invalid').addClass('is-valid');
+            }
+        }
+    }
+    function validarDropDownList(element) {
+        const $select = $(element);
+        const valor = $select.val();
+        var $errorSpan = $select.closest('.input-group').next('p');
+        if (valor && valor !== "") {
+            $select.removeClass('is-invalid').addClass('is-valid');
+            $errorSpan.text("").attr('hidden', 'hidden');
+        } else {
+            $select.removeClass('is-valid');
+        }
+    }
 </script>
