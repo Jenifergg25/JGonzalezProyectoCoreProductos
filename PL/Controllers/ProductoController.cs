@@ -331,15 +331,24 @@ namespace PL.Controllers
             }
         }
         [HttpPost]
-        public JsonResult AddOrUpdate(ML.Producto producto, IFormFile? Imagen)
+        public JsonResult AddOrUpdate(ML.Producto producto, IFormFile? Imagen, string ImagenExistente)
         {
-            if (Imagen != null)
+            if (Imagen != null && Imagen.Length > 0)
             {
-                using (var ms = new MemoryStream())
+                using (var memoryStream = new MemoryStream())
                 {
-                    Imagen.CopyTo(ms); 
-                    producto.Imagen = ms.ToArray();
+                    Imagen.CopyTo(memoryStream);
+                    producto.Imagen = memoryStream.ToArray();
                 }
+            }
+            else if (!string.IsNullOrEmpty(ImagenExistente))
+            {
+                var base64 = ImagenExistente.Substring(ImagenExistente.IndexOf(",") + 1);
+                producto.Imagen = Convert.FromBase64String(base64);
+            }
+            else
+            {
+                producto.Imagen = null;
             }
             ML.Result result;
 

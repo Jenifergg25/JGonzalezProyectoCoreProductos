@@ -37,7 +37,8 @@
 
 
 <div id="contenedorProductos" class="row">
-    </div>
+
+
 </div>
 
 <div class="modal fade" id="modalProducto" tabindex="-1" aria-hidden="true">
@@ -52,10 +53,11 @@
                     <input type="hidden" name="IdProducto" id="IdProducto" value="0" />
                     <div class="row mb-3">
                         <div class="d-flex justify-content-center">
-                            <img id="previewImg" src="/Imagenes/iconoproducto.png" style="width: 200px; display:none;" />
+                            <img id="previewImg" src="/Imagenes/iconoproducto.png" style="width: 250px; display:none;" />
                         </div>
                         <div class="d-flex justify-content-center mt-2">
                             <input type="file" class="form-control rounded w-50" name="Imagen" id="imagenProducto" accept="image/*" onchange="CargarImagen(this)" />
+                                <input type="hidden" name="ImagenExistente" id="ImagenExistente" />
                         </div>
                     </div>
 
@@ -77,7 +79,7 @@
                                 <div class="input-group-text bg-dark text-white">
                                     <i class="bi bi-currency-dollar p-1 fs-5"></i>
                                 </div>
-                                <input type="number" step="0.01" class="form-control" id="precioProducto" name="Precio" placeholder="Ingrese el precio del producto" data-obligatorio="true" onkeypress="return ValidarPrecio(event);" oninput="ValidarPrecio(event);" onblur="ValidarPrecio(event)" />
+                                <input type="number" class="form-control" id="precioProducto" name="Precio" placeholder="Ingrese el precio del producto" data-obligatorio="true" onkeypress="return ValidarPrecio(event);" oninput="ValidarPrecio(event);" onblur="ValidarPrecio(event)" />
                             </div>
                                 <p hidden="hidden"></p>
                         </div>
@@ -237,7 +239,6 @@
     function limpiarFormulario() {
         $('#formProducto')[0].reset();
         $('#IdProducto').val('');
-        $('#previewImg').attr('src', '/Imagenes/iconoproducto.png').show();
         $('#formProducto').find('p').text('').addClass('text-danger').attr('hidden', 'hidden');
         $('#formProducto').find('input, select, textarea').removeClass('is-invalid is-valid');
         resetearDropdown('#ddlSubCategoriaModal');
@@ -292,6 +293,7 @@
     function abrirModalNuevoProducto() {
         cargarCategorias('#ddlCategoriaModal').done(function () {
             $('#modalProducto .modal-title').text('Nuevo Producto');
+            $('#previewImg').attr('src', '/Imagenes/iconoproducto.png').show();
             $('#imagenProducto').val('');
             resetearDropdown('#ddlSubCategoriaModal');
             limpiarFormulario();
@@ -382,20 +384,22 @@
                 $.each(data, function (i, producto) {
                     var imgSrc = producto.imagenBase64 ? producto.imagenBase64 : '/Imagenes/iconoproducto.png';
                     contenedor.append(`
-                        <div class="col-lg-4 col-md-5 d-flex justify-content-center mb-4">
+                                <div class="col-lg-4 col-md-5 d-flex justify-content-center mb-4 collapse">
                             <div class="card shadow-lg border-0 rounded-4" style="width: 100%; max-width: 400px;">
                                 <img src="${imgSrc}" class="card-img-top rounded-top-4" alt="${producto.nombre}"
                                     style="height: 200px; object-fit: cover;"
                                     onerror="this.onerror=null;this.src='/images/icon-placeholder.png';" />
                                 <div class="card-body d-flex flex-column text-center">
                                         <h5 class="card-title mb-2 text-dark  fw-bold">${producto.nombre}</h5>
-                                        <p class="card-text">${producto.categoria || 'N/A'}</p>
-                                    <p class="card-text small text-muted text-wrap" title="${producto.descripcion || ''}">
+                                            <div class="row justify-content-center">
+                                                    <p class="card-text badge bg-success w-auto p-2 m-1">${producto.categoria || 'N/A'}</p>
+                                                    </div>
+                                    <p class="card-text small text-muted text-wrap" title="${producto.descripcion || ''}" style = "text-align: justify;">
                                         ${producto.descripcion || 'Sin descripción'}
                                     </p>
                                     <p class="card-text"><strong>Subcategoría:</strong> ${producto.subCategoria || 'N/A'}</p>
                                     <p class="card-text fs-5 fw-semibold text-success mb-3">
-                                        $${producto.precio.toFixed(2)} el kilo
+                                        $${producto.precio.toFixed(2)} por kilo
                                     </p>
                                     <div class="d-flex justify-content-center gap-2 mt-auto">
                                             <button class="btn btn-warning btn-sm px-3" onclick="obtenerProductoPorId(${producto.idProducto})">
@@ -442,6 +446,8 @@
 
                     if (producto.imagenBase64) {
                         $('#previewImg').attr('src', producto.imagenBase64).show();
+                        $('#ImagenExistente').val(producto.imagenBase64);
+
                     } else {
                         $('#previewImg').attr('src', '/Imagenes/iconoproducto.png');
                     }
@@ -498,12 +504,11 @@
     function ValidarNombreProducto(event) {
         var $input = $(event.target);
         var valor = $input.val();
-        var letras = /^[a-zA-ZÁÉÍÓÚáéíóúÑñ\s]*$/;
+        var regexLetra = /^[a-zA-ZÁÉÍÓÚáéíóúÑñ\s]$/;
         const $errorSpan = $input.parent().parent().find('p');
 
         if (event.type === "keypress") {
             var tecla = event.key;
-            var regexLetra = /^[a-zA-ZÁÉÍÓÚáéíóúÑñ\s]$/;
             if (!regexLetra.test(tecla)) {
                 $errorSpan.text("El nombre del producto solo puede tener letras").addClass('text-danger').removeAttr('hidden');
                 $input.removeClass('is-valid').addClass('is-invalid');
@@ -533,7 +538,7 @@
                 return;
             }
 
-            if (letras.test(valor)) {
+            if (regexLetra.test(valor)) {
                 $errorSpan.text('').addClass('text-danger').attr('hidden', 'hidden');
                 $input.removeClass('is-invalid').addClass('is-valid');
                 return;
@@ -543,50 +548,63 @@
         }
     }
 
-    function ValidarPrecio(event) {
-        var $input = $(event.target);
-        var valor = $input.val();
-        const $errorSpan = $input.parent().parent().find('p');
+        function ValidarPrecio(event) {
+            var $input = $(event.target);
+            var valor = $input.val();
+            const $errorSpan = $input.parent().parent().find('p');
 
-        var regexDecimal = /^\d+(\.\d{1,2})?$/;
+            if (event.type === 'keypress') {
+                const tecla = event.key;
 
-        if (event.type === 'keypress') {
-            const tecla = event.key;
-            const valorActual = $input.val();
+                if (tecla === '.' && valor.includes('.')) {
+                    $errorSpan.text("Solo se permite un punto decimal").removeAttr('hidden');
+                    $input.removeClass('is-valid').addClass('is-invalid');
+                    event.preventDefault();
+                    return;
+                }
 
-            if (!/[\d.]/.test(tecla)) {
-                $errorSpan.text("Solo numeros y decimales ej. 12.50, 8, 25.50").addClass('text-danger').removeAttr('hidden');
-                $input.removeClass('is-valid').addClass('is-invalid');
-                event.preventDefault();
+                const valorPrevisto = valor + tecla;
+
+                const regex = /^\d{0,8}(\.?\d{0,2})?$/
+
+                if (!regex.test(valorPrevisto)) {
+                    $errorSpan.text("Número no válido, máximo 8 enteros y 2 decimales").removeAttr('hidden');
+                    $input.removeClass('is-valid').addClass('is-invalid');
+                    event.preventDefault();
+                }
             }
 
-            if (tecla === '.' && valorActual.includes('.')) {
-                event.preventDefault();
+            if (event.type === "input" || event.type === "blur") {
+                if (valor.trim() === "") {
+                    $errorSpan.text("El campo precio es obligatorio").removeAttr('hidden');
+                    $input.removeClass('is-valid').addClass('is-invalid');
+                    return;
+                }
+
+                const regexValido = /^\d{1,8}(\.\d{1,2})?$/
+                const regexInvalidoPuntoSolo = /^\d{1,8}\.$/ 
+
+                if (regexInvalidoPuntoSolo.test(valor)) {
+                    $errorSpan.text("Si usa punto debe poner al menos un decimal").removeAttr('hidden');
+                    $input.removeClass('is-valid').addClass('is-invalid');
+                    return;
+                }
+
+                if (regexValido.test(valor)) {
+                    $errorSpan.text('').attr('hidden', 'hidden');
+                    $input.removeClass('is-invalid').addClass('is-valid');
+                    return;
+                } else {
+                    $errorSpan.text("Número no válido (máx 8 enteros y 2 decimales)").removeAttr('hidden');
+                    $input.removeClass('is-valid').addClass('is-invalid');
+                }
             }
         }
-
-        if (event.type === "input" || event.type === "blur") {
-            if (valor.trim() === "") {
-                $errorSpan.text("El campo precio es obligatorio").addClass('text-danger').removeAttr('hidden');
-                $input.removeClass('is-valid').addClass('is-invalid');
-                return;
-            }
-
-            if (regexDecimal.test(valor)) {
-                $errorSpan.text('').attr('hidden', 'hidden');
-                $input.removeClass('is-invalid').addClass('is-valid');
-            } else {
-                $errorSpan.text("Ingrese un número válido (ej: 10 o 10.50)").addClass('text-danger').removeAttr('hidden');
-                $input.removeClass('is-valid').addClass('is-invalid');
-            }
-        }
-    }
 
     function validarDescripcion(event) {
         var $input = $(event.target);
         var valor = $input.val();
         const $errorSpan = $input.parent().parent().find('p');
-        var regexCalle = /^[a-zA-Z0-9ÁÉÍÓÚáéíóúÑñ\s.,-]{10,500}$/;
 
         if (event.type === "keypress") {
             var tecla = event.key;
@@ -600,11 +618,12 @@
         }
 
         if (event.type === "input" || event.type === "blur") {
-            if (!regexCalle.test(valor)) {
-                $errorSpan.text("La descripción debe tener entre 10 y 500 caracteres").addClass('text-danger').removeAttr('hidden');
-                $input.removeClass('is-valid').addClass('is-invalid');
+            if (valor.trim() === "") {
+                $errorSpan.text("").attr('hidden', 'hidden');
+                $input.removeClass('is-invalid').addClass('is-valid');
+                return;
             }
-            else if (valor.length < 10) {
+            if (valor.length < 10) {
                 $errorSpan.text("La descripcion debe tener mínimo 10 caracteres requeridos").addClass('text-danger').removeAttr('hidden');
                 $input.removeClass('is-valid').addClass('is-invalid');
             }
