@@ -213,6 +213,11 @@
 
             let formData = new FormData(this);
 
+            const archivoInput = $('#imagenProducto')[0];
+                if (archivoInput.files.length === 0) {
+                formData.delete('Imagen');
+            }
+
             $.ajax({
                 url: '/Producto/AddOrUpdate',
                 type: 'POST',
@@ -226,8 +231,12 @@
                         cargarProductos();
                         limpiarFormulario();
                     } else {
-                        Swal.fire('Error', response.message, 'error');
-                    }
+                            if (response.errors) {
+                                Swal.fire('Errores de validación', response.errors.join('<br>'), 'error');
+                            } else {
+                                Swal.fire('Error', response.message, 'error');
+                            }
+                        }
                 },
                 error: function () {
                     Swal.fire('Error', 'Error inesperado al guardar el producto.', 'error');
@@ -238,7 +247,7 @@
 
     function limpiarFormulario() {
         $('#formProducto')[0].reset();
-        $('#IdProducto').val('');
+        $('#IdProducto').val(0);
         $('#formProducto').find('p').text('').addClass('text-danger').attr('hidden', 'hidden');
         $('#formProducto').find('input, select, textarea').removeClass('is-invalid is-valid');
         resetearDropdown('#ddlSubCategoriaModal');
@@ -294,7 +303,8 @@
         cargarCategorias('#ddlCategoriaModal').done(function () {
             $('#modalProducto .modal-title').text('Nuevo Producto');
             $('#previewImg').attr('src', '/Imagenes/iconoproducto.png').show();
-            $('#imagenProducto').val('');
+                $('#imagenProducto').val('');
+                $('#ImagenExistente').val('');
             resetearDropdown('#ddlSubCategoriaModal');
             limpiarFormulario();
 
@@ -431,6 +441,8 @@
             data: { idProducto: idProducto },
             success: function (producto) {
                 if (producto) {
+                    $('#formProducto').find('p').text('').addClass('text-danger').attr('hidden', 'hidden');
+                    $('#formProducto').find('input, select, textarea').removeClass('is-invalid is-valid');
                     $('#IdProducto').val(producto.idProducto);
                     $('#nombreProducto').val(producto.nombre);
                     $('#precioProducto').val(producto.precio);

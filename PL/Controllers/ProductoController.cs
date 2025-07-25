@@ -1,5 +1,6 @@
 ﻿using BL;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using ML;
 
 namespace PL.Controllers
@@ -331,7 +332,7 @@ namespace PL.Controllers
             }
         }
         [HttpPost]
-        public JsonResult AddOrUpdate(ML.Producto producto, IFormFile? Imagen, string ImagenExistente)
+        public JsonResult AddOrUpdate(/*[Bind(Prefix = "")]*/ML.Producto producto, IFormFile? Imagen, string? ImagenExistente)
         {
             if (Imagen != null && Imagen.Length > 0)
             {
@@ -350,6 +351,14 @@ namespace PL.Controllers
             {
                 producto.Imagen = null;
             }
+
+            ModelState.Remove("Imagen");
+            if (!ModelState.IsValid)
+            {
+                var errores = ModelState.Values.SelectMany(v => v.Errors).Select(x => x.ErrorMessage).ToList();
+                return Json(new { success = false, message = "Hay errores de validación", errors = errores });
+            }
+
             ML.Result result;
 
             if (producto.IdProducto == 0)
